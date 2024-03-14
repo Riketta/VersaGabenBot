@@ -27,7 +27,7 @@ namespace VersaGabenBot
 
         private static readonly ulong gabenGuildId = 293649968865214464;
         private static readonly ulong botzoneChannelId = 649913439556206592;
-        private static readonly ulong generalChannelId = 966112429895479336;
+        private static readonly ulong generalChannelId = 293649968865214464;
 
         //private static readonly IServiceProvider _services = ConfigureServices();
 
