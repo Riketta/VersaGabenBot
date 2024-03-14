@@ -21,6 +21,7 @@ namespace VersaGabenBot
         private static readonly string tokenFile = "token.txt";
 
         private static readonly string[] statusList = new string[] { "Warzone: Zombie Piglin", "The Last of Us: 3060", "Warcraft Fishman", "Hahullbreaker", "Ghost of Kijuw", "Metro 2077: Rusted", "Dota 3", "CS: GO HOME", "World of Minecraft", "Doomstiny", "Fortignite", "WTS Boost", "Battle for LootBox", "Overbotch 2", "Photone Rush", "Cyberpunk 1337", "StarCraft Dungeons" };
+        private static readonly string[] statusList = new string[] { "Zap Volt Overcharge", "Hahool: Kazovstan", "Warzone: Zombie Piglin", "The Last of Us: 3060", "Warcraft Fishman", "Hahullbreaker", "Ghost of Kijuw", "Metro 2077: Rusted", "Dota 3", "CS: GO HOME", "World of Minecraft", "Doomstiny", "Fortignite", "WTS Boost", "Battle for LootBox", "Overbotch 2", "Photone Rush", "Cyberpunk 1337", "StarCraft Dungeons" };
         private static readonly int statusTimeout = 60 * 45 * 1000;
         private static readonly Timer statusTimer = new Timer();
 
