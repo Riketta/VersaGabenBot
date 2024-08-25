@@ -10,6 +10,9 @@ namespace VersaGabenBot.Guilds
     internal class Guild
     {
         [JsonProperty]
+        public List<string> BotNames { get; private set; }
+
+        [JsonProperty]
         public ulong GuildID { get; private set; }
 
         [JsonProperty]
