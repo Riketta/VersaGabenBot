@@ -14,7 +14,7 @@ using Timer = System.Timers.Timer;
 
 namespace VersaGabenBot
 {
-    public class Bot
+    internal class Bot
     {
         private Logger logger = Logger.GetLogger(); // TODO: inject.
 
