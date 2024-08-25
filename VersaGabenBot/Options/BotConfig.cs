@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VersaGabenBot.Options
 {
-    public class BotConfig
+    public class BotConfig : IOptions
     {
         public string Token { get; set; }
         public ulong GuildID { get; set; }
