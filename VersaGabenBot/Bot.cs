@@ -9,29 +9,28 @@ using System.Timers;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using VersaGabenBot.Options;
 using Timer = System.Timers.Timer;
 
 namespace VersaGabenBot
 {
     public class Bot
     {
-        private static Logger logger = Logger.GetLogger();
+        private Logger logger = Logger.GetLogger(); // TODO: inject.
 
-        private static readonly Random random = new Random();
-        private static readonly string tokenFile = "token.txt";
+        private readonly Random random = new Random();
+        private readonly Timer statusTimer = new Timer();
 
-        private static readonly string[] statusList = new string[] { "Warzone: Zombie Piglin", "The Last of Us: 3060", "Warcraft Fishman", "Hahullbreaker", "Ghost of Kijuw", "Metro 2077: Rusted", "Dota 3", "CS: GO HOME", "World of Minecraft", "Doomstiny", "Fortignite", "WTS Boost", "Battle for LootBox", "Overbotch 2", "Photone Rush", "Cyberpunk 1337", "StarCraft Dungeons" };
-        private static readonly string[] statusList = new string[] { "Zap Volt Overcharge", "Hahool: Kazovstan", "Warzone: Zombie Piglin", "The Last of Us: 3060", "Warcraft Fishman", "Hahullbreaker", "Ghost of Kijuw", "Metro 2077: Rusted", "Dota 3", "CS: GO HOME", "World of Minecraft", "Doomstiny", "Fortignite", "WTS Boost", "Battle for LootBox", "Overbotch 2", "Photone Rush", "Cyberpunk 1337", "StarCraft Dungeons" };
-        private static readonly int statusTimeout = 60 * 45 * 1000;
-        private static readonly Timer statusTimer = new Timer();
 
-        private static readonly ulong gabenGuildId = 293649968865214464;
-        private static readonly ulong botzoneChannelId = 649913439556206592;
-        private static readonly ulong generalChannelId = 293649968865214464;
+        private BotConfig _config;
+        //private readonly IServiceProvider _services = ConfigureServices();
 
-        //private static readonly IServiceProvider _services = ConfigureServices();
+        public Bot(BotConfig config)
+        {
+            _config = config;
+        }
 
-        private static readonly DiscordSocketClient _client = new DiscordSocketClient(new DiscordSocketConfig
+        private readonly DiscordSocketClient _client = new DiscordSocketClient(new DiscordSocketConfig
         {
             // How much logging do you want to see?
             LogLevel = LogSeverity.Info,
@@ -42,16 +41,14 @@ namespace VersaGabenBot
 
         // Keep the CommandService and DI container around for use with commands.
         // These two types require you install the Discord.Net.Commands package.
-        private static readonly CommandService _commands = new CommandService(new CommandServiceConfig
+        private readonly CommandService _commands = new CommandService(new CommandServiceConfig
         {
             LogLevel = LogSeverity.Info,
             CaseSensitiveCommands = false,
         });
 
-        public static async Task Start()
+        public async Task Start()
         {
-            var token = File.ReadAllText(tokenFile);
-
             _client.Log += Log;
             _client.MessageReceived += Client_MessageReceived;
             _client.UserJoined += Client_UserJoined;
@@ -65,94 +62,72 @@ namespace VersaGabenBot
             //await InitCommands();
 
             // Login and connect.
-            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.LoginAsync(TokenType.Bot, _config.Token);
             await _client.StartAsync();
 
-            statusTimer.Interval = statusTimeout;
+            statusTimer.Interval = _config.StatusUpdateInterval;
             statusTimer.Elapsed += StatusTimer_Elapsed;
             statusTimer.Start();
             logger.Info("Initial status: \"{0}\"", SetRandomStatus());
         }
 
-        private static async Task Client_UserIsTyping(Cacheable<IUser, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
+        private async Task Client_UserIsTyping(Cacheable<IUser, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
         {
             if (arg1.Value.Username == "Riketta")
-                await (_client.GetChannel(botzoneChannelId) as ISocketMessageChannel).SendMessageAsync("DEBUG");
+                await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync("DEBUG");
         }
 
-        private static async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
+        private async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
         {
             string message = string.Format("[InviteDeleted] \"{0}\" for \"{1}\"", code, channel?.Name ?? "-");
             logger.Info(message);
-            await (_client.GetChannel(botzoneChannelId) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
-        private static async Task Client_InviteCreated(SocketInvite invite)
+        private async Task Client_InviteCreated(SocketInvite invite)
         {
             string message = string.Format("[InviteCreated] \"{0}\" (\"{1}\"): \"{2}\" for \"{3}\"", invite.Inviter.Username, invite.Inviter.Nickname ?? "-", invite.Code, invite.TargetUser?.Username ?? "-");
             logger.Info(message);
-            await(_client.GetChannel(botzoneChannelId) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
-        private static async Task Client_UserLeft(SocketGuild guild, SocketUser user)
+        private async Task Client_UserLeft(SocketGuild guild, SocketUser user)
         {
             string message = string.Format("[UserLeft] \"{0}\"", user.Username);
             logger.Info(message);
-            await (_client.GetChannel(botzoneChannelId) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
-        private static async Task Client_UserJoined(SocketGuildUser user)
+        private async Task Client_UserJoined(SocketGuildUser user)
         {
             string message = string.Format("[UserJoined] \"{0}\"", user.Username);
             logger.Info(message);
-            await (_client.GetChannel(botzoneChannelId) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
-        private static void StatusTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void StatusTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             logger.Info("Updating status: \"{0}\"", SetRandomStatus());
         }
 
-        private static string SetRandomStatus()
+        private string SetRandomStatus()
         {
-            string status = statusList[random.Next(statusList.Length)];
+            string status = _config.StatusList[random.Next(_config.StatusList.Count)];
             _client.SetActivityAsync(new Game(status));
 
             return status;
         }
 
-        private static async Task Client_MessageReceived(SocketMessage msg)
+        private async Task Client_MessageReceived(SocketMessage msg)
         {
             var message = msg as SocketUserMessage;
             if (message == null) return;
 
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
-            if (message.Channel.Id != generalChannelId && message.Channel.Id != botzoneChannelId) return;
-
-            if (message.Content.Contains("🇺🇦"))
-                await message.AddReactionAsync(new Emoji("🐷"));
-            else if (message.Content.Contains("🐸"))
-                await message.AddReactionAsync(new Emoji("🐸"));
-            else if (message.Content.Contains("🇷🇺"))
-                await message.AddReactionAsync(new Emoji("🐻‍❄️"));
-            else if (message.Content.ToLower().Contains("хахoл"))
-            {
-                    await message.AddReactionAsync(new Emoji("🙋🏿‍♂️"));
-                    await message.AddReactionAsync(new Emoji("🙋🏿"));
-            }
-            else
-            {
-                foreach (var mention in message.MentionedUsers)
-                    if (mention.Id == _client.CurrentUser.Id)
-                    {
-                        await message.Channel.SendMessageAsync("🐸");
-                        logger.Debug(message.Content);
-                        break;
-                    }
-            }
+            if (message.Channel.Id != _config.GeneralChannelID && message.Channel.Id != _config.BotChannelID) return;
         }
 
-        private static Task Log(LogMessage message)
+        private Task Log(LogMessage message)
         {
             switch (message.Severity)
             {
@@ -181,7 +156,7 @@ namespace VersaGabenBot
         // If any services require the client, or the CommandService, or something else you keep on hand,
         // pass them as parameters into this method as needed.
         // If this method is getting pretty long, you can seperate it out into another file using partials.
-        //private static IServiceProvider ConfigureServices()
+        //private IServiceProvider ConfigureServices()
         //{
         //    var map = new ServiceCollection()
         //        // Repeat this for all the service classes
@@ -197,7 +172,7 @@ namespace VersaGabenBot
         // Example of a logging handler. This can be re-used by addons
         // that ask for a Func<LogMessage, Task>.
 
-        //private static async Task InitCommands()
+        //private async Task InitCommands()
         //{
         //    // Either search the program and add all Module classes that can be found.
         //    // Module classes MUST be marked 'public' or they will be ignored.
@@ -212,7 +187,7 @@ namespace VersaGabenBot
         //    _client.MessageReceived += HandleCommandAsync;
         //}
 
-        //private static async Task HandleCommandAsync(SocketMessage arg)
+        //private async Task HandleCommandAsync(SocketMessage arg)
         //{
         //    // Bail out if it's a System Message.
         //    var message = arg as SocketUserMessage;

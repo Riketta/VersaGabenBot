@@ -14,11 +14,14 @@ namespace VersaGabenBot
         public static Task Main(string[] args) => new Program().MainAsync();
         public async Task MainAsync()
         {
+            var config = Config.LoadOrCreateDefault(Config.DefaultConfigPath);
+
             var assemblyName = Assembly.GetEntryAssembly().GetName();
             Console.Title = string.Format("{0} ver. {1}", assemblyName.Name, assemblyName.Version);
             logger.Info(Console.Title);
 
-            await Bot.Start();
+            Bot bot = new Bot(config.BotConfig);
+            await bot.Start();
 
             await Task.Delay(Timeout.Infinite);
         }

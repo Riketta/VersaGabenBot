@@ -11,9 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="token.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="VersaGabenBot.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
