@@ -22,7 +22,7 @@ namespace VersaGabenBot
         private readonly Timer statusTimer = new Timer();
 
 
-        private BotConfig _config;
+        private readonly BotConfig _config;
         //private readonly IServiceProvider _services = ConfigureServices();
 
         public Bot(BotConfig config)
