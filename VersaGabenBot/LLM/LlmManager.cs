@@ -24,8 +24,9 @@ namespace VersaGabenBot.LLM
 
         public async Task ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
         {
-            // TODO: make history type optional (save messages for bot or all).
-            guild.AppendMessage(message.Channel.Id, new Message(Roles.User, message)); // Store messages in history that not even addressed to bot.
+            // Store messages in history that not even addressed to bot.
+            if (!_options.OnlySaveChatHistoryRelatedToBot)
+                guild.AppendMessage(message.Channel.Id, new Message(Roles.User, message));
 
             bool isRandomReply = new Random().NextDouble() <= _options.RandomReplyChance;
             bool isMentioned = message.MentionedUsers.Any(user => user.Id == currentUser.Id);
@@ -33,6 +34,8 @@ namespace VersaGabenBot.LLM
             if (!isMentioned && !isRandomReply)
                 return;
 
+            if (_options.OnlySaveChatHistoryRelatedToBot)
+                guild.AppendMessage(message.Channel.Id, new Message(Roles.User, message));
             Message response = await _client.GenerateTextAsync(guild.MessageHistoryPerChannel[message.Channel.Id].ToArray());
             guild.AppendMessage(message.Channel.Id, response);
 
