@@ -123,8 +123,7 @@ namespace VersaGabenBot
 
         private async Task Client_MessageReceived(SocketMessage msg)
         {
-            var message = msg as SocketUserMessage;
-            if (message == null) return;
+            if (msg is not SocketUserMessage message) return;
 
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
             if (message.Channel.Id != _config.GeneralChannelID && message.Channel.Id != _config.BotChannelID) return;
