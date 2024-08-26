@@ -14,5 +14,6 @@ namespace VersaGabenBot.Options
         public ulong BotChannelID { get; set; }
         public uint StatusUpdateInterval { get; set; } = 60 * 60 * 1000;
         public List<string> StatusList { get; set; }
+        public double RandomReplyChance { get; set; } = 0.01f;
     }
 }

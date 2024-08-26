@@ -129,8 +129,9 @@ namespace VersaGabenBot
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
             if (message.Channel.Id != _config.GeneralChannelID && message.Channel.Id != _config.BotChannelID) return;
 
+            bool isRandomReply = new Random().NextDouble() <= _config.RandomReplyChance;
             bool isMentioned = message.MentionedUsers.Any(user => user.Id == _client.CurrentUser.Id);
-            if (message.Channel.Id == _config.GeneralChannelID && isMentioned)
+            if (message.Channel.Id == _config.GeneralChannelID && (isMentioned || isRandomReply))
             {
                 string llmAnswer = await _ollama.GenerateTextAsync(message.Content);
                 logger.Debug(message.Content);
