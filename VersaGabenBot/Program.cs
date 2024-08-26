@@ -23,6 +23,15 @@ namespace VersaGabenBot
 
             OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
             Bot bot = new Bot(config.BotConfig, ollamaClient);
+            GuildManager guildManager = new GuildManager(config.GuildOptions);
+
+            // Sample guild registration.
+            //Guild guild = guildManager.RegisterGuild(293649968865214464);
+            //guild.BotChannelID = 649913439556206592;
+            //guild.RegisterChannel(guild.BotChannelID);
+            //guild.RegisterChannel(293649968865214464);
+            //config.Save();
+
             await bot.Start();
 
             await Task.Delay(Timeout.Infinite);
