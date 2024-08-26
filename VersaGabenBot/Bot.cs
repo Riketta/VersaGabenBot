@@ -9,6 +9,7 @@ using System.Timers;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using VersaGabenBot.Ollama;
 using VersaGabenBot.Options;
 using Timer = System.Timers.Timer;
 
@@ -21,13 +22,15 @@ namespace VersaGabenBot
         private readonly Random random = new Random();
         private readonly Timer statusTimer = new Timer();
 
-
         private readonly BotConfig _config;
+        private readonly OllamaClient _ollama;
+
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config)
+        public Bot(BotConfig config, OllamaClient ollama)
         {
             _config = config;
+            _ollama = ollama;
         }
 
         private readonly DiscordSocketClient _client = new DiscordSocketClient(new DiscordSocketConfig
@@ -125,6 +128,13 @@ namespace VersaGabenBot
 
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
             if (message.Channel.Id != _config.GeneralChannelID && message.Channel.Id != _config.BotChannelID) return;
+
+            if (message.Channel.Id == _config.GeneralChannelID || message.Channel.Id == _config.BotChannelID)
+            {
+                string llmAnswer = await _ollama.GenerateTextAsync(message.Content);
+                await message.Channel.SendMessageAsync(llmAnswer);
+                logger.Debug(message.Content);
+            }
         }
 
         private Task Log(LogMessage message)

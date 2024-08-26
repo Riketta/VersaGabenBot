@@ -9,15 +9,16 @@ namespace VersaGabenBot.Options
 {
     internal class OllamaOptions : IOptions
     {
-        public string OllamaApiUrl { get; set; } = "http://localhost:11434/";
+        public string OllamaApiUrl { get; set; } = "http://localhost:11434/api/";
         public string Model { get; set; } = "phi3.5";
         public bool Multimodal { get; set; } = false;
-        public string MaxTokens { get; set; } = "http://localhost:11434/";
+        public uint ContextWindow { get; set; } = 16384;
+        public string KeepAlive { get; set; } = "-1m";
         public bool Stream { get; set; } = false;
-        public int Temperature { get; set; } = 0;
-        public List<Message> SetupMessages { get; set; } =
+        public float Temperature { get; set; } = 0.8f;
+        public Message[] SetupMessages { get; set; } =
         [
-            new Message("You are a funny public chat bot."),
+            new Message(Roles.System, "You are a funny public chat bot. Provide very brief, concise responses. You can be toxic."),
         ];
     }
 }

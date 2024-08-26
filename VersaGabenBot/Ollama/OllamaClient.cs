@@ -1,16 +1,29 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using VersaGabenBot.Options;
 using System;
+using System.Collections.Generic;
+using Newtonsoft.Json.Converters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 
 namespace VersaGabenBot.Ollama
 {
     internal class OllamaClient
     {
+        private static JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)
+            }
+        };
+
         private readonly OllamaOptions _options;
         private readonly HttpClient _httpClient;
 
@@ -24,30 +37,34 @@ namespace VersaGabenBot.Ollama
             };
         }
 
-        public async Task<string> GenerateTextAsync(string message, int maxTokens = 8)
+        public async Task<string> GenerateTextAsync(string message)
         {
-            var requestData = new
+            ChatRequest chatRequest = new ChatRequest()
             {
-                messages = new[]
+                Model = _options.Model,
+                Messages = new List<Message>(_options.SetupMessages),
+                ModelfileOptions = new ModelfileOptions()
                 {
-                    new { role = "user", content = message }
+                    ContextWindow = _options.ContextWindow,
+                    Temperature = _options.Temperature
                 },
-                max_tokens = maxTokens
+                Stream = _options.Stream,
+                KeepAlive = _options.KeepAlive,
             };
+            chatRequest.Messages.Add(new Message(Roles.User, message));
 
-            var jsonRequest = JsonConvert.SerializeObject(requestData, new JsonSerializerSettings
-            {
-                ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }
-            });
+            string jsonRequest = JsonSerializer.Serialize(chatRequest, serializerOptions);
 
-            var response = await _httpClient.PostAsync($"/chat", new StringContent(jsonRequest, Encoding.UTF8, "application/json"));
+            var response = await _httpClient.PostAsync($"chat", new StringContent(jsonRequest, Encoding.UTF8, "application/json"));
             var responseJson = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
-                throw new HttpRequestException($"Failed to generate text. Status code: {response.StatusCode}, Body: {responseJson}");
+                throw new HttpRequestException($"Failed to generate text. Request: {response.RequestMessage.RequestUri}; Status code: {response.StatusCode}; Body: {responseJson}.");
 
-            var responseData = JObject.Parse(responseJson);
-            return responseData["choices"][0]["message"]["content"].ToString();
+            var responseData = JsonNode.Parse(responseJson);
+            string llmResponse = responseData["message"]["content"].ToString();
+
+            return llmResponse;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using VersaGabenBot.Ollama;
 
 namespace VersaGabenBot
 {
@@ -20,7 +21,8 @@ namespace VersaGabenBot
             Console.Title = string.Format("{0} ver. {1}", assemblyName.Name, assemblyName.Version);
             logger.Info(Console.Title);
 
-            Bot bot = new Bot(config.BotConfig);
+            OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
+            Bot bot = new Bot(config.BotConfig, ollamaClient);
             await bot.Start();
 
             await Task.Delay(Timeout.Infinite);
