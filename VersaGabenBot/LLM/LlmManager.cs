@@ -34,6 +34,8 @@ namespace VersaGabenBot.LLM
             if (!isMentioned && !isRandomReply)
                 return;
 
+            IDisposable typing = message.Channel.EnterTypingState();
+
             if (_options.OnlySaveChatHistoryRelatedToBot)
                 guild.AppendMessage(message.Channel.Id, new Message(Roles.User, message));
             Message response = await _client.GenerateTextAsync(guild.MessageHistoryPerChannel[message.Channel.Id].ToArray());
