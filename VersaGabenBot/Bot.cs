@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -10,6 +12,8 @@ using System.Timers;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using VersaGabenBot.Guilds;
+using VersaGabenBot.LLM;
 using VersaGabenBot.Ollama;
 using VersaGabenBot.Options;
 using Timer = System.Timers.Timer;
@@ -24,14 +28,16 @@ namespace VersaGabenBot
         private readonly Timer statusTimer = new Timer();
 
         private readonly BotConfig _config;
-        private readonly OllamaClient _ollama;
+        private readonly LlmManager _llmManager;
+        private readonly GuildManager _guildManager;
 
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config, OllamaClient ollama)
+        public Bot(BotConfig config, LlmManager llmManager, GuildManager guildManager)
         {
             _config = config;
-            _ollama = ollama;
+            _llmManager = llmManager;
+            _guildManager = guildManager;
         }
 
         private readonly DiscordSocketClient _client = new DiscordSocketClient(new DiscordSocketConfig
@@ -75,38 +81,44 @@ namespace VersaGabenBot
             logger.Info("Initial status: \"{0}\"", SetRandomStatus());
         }
 
-        private async Task Client_UserIsTyping(Cacheable<IUser, ulong> arg1, Cacheable<IMessageChannel, ulong> arg2)
-        {
-            if (arg1.Value.Username == "Riketta")
-                await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync("DEBUG");
-        }
-
         private async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
         {
+            Guild guild = _guildManager.GetGuildByChannelUUID(channel.Id);
+            if (guild is null) return;
+
             string message = string.Format("[InviteDeleted] \"{0}\" for \"{1}\"", code, channel?.Name ?? "-");
             logger.Info(message);
-            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private async Task Client_InviteCreated(SocketInvite invite)
         {
+            Guild guild = _guildManager.GetGuildByChannelUUID(invite.Guild.Id);
+            if (guild is null) return;
+
             string message = string.Format("[InviteCreated] \"{0}\" (\"{1}\"): \"{2}\" for \"{3}\"", invite.Inviter.Username, invite.Inviter.Nickname ?? "-", invite.Code, invite.TargetUser?.Username ?? "-");
             logger.Info(message);
-            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
-        private async Task Client_UserLeft(SocketGuild guild, SocketUser user)
+        private async Task Client_UserLeft(SocketGuild socketGuild, SocketUser user)
         {
+            Guild guild = _guildManager.GetGuildByChannelUUID(socketGuild.Id);
+            if (guild is null) return;
+
             string message = string.Format("[UserLeft] \"{0}\"", user.Username);
             logger.Info(message);
-            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
+            Guild guild = _guildManager.GetGuildByChannelUUID(user.Guild.Id);
+            if (guild is null) return;
+
             string message = string.Format("[UserJoined] \"{0}\"", user.Username);
             logger.Info(message);
-            await (_client.GetChannel(_config.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private void StatusTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -125,18 +137,12 @@ namespace VersaGabenBot
         private async Task Client_MessageReceived(SocketMessage msg)
         {
             if (msg is not SocketUserMessage message) return;
-
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
-            if (message.Channel.Id != _config.GeneralChannelID && message.Channel.Id != _config.BotChannelID) return;
 
-            bool isRandomReply = new Random().NextDouble() <= _config.RandomReplyChance;
-            bool isMentioned = message.MentionedUsers.Any(user => user.Id == _client.CurrentUser.Id);
-            if (message.Channel.Id == _config.GeneralChannelID && (isMentioned || isRandomReply))
-            {
-                string llmAnswer = await _ollama.GenerateTextAsync(message.Content);
-                logger.Debug(message.Content);
-                await message.ReplyAsync(llmAnswer);
-            }
+            Guild guild = _guildManager.GetGuildByChannelUUID(message.Channel.Id);
+            if (guild is null) return;
+
+            await _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild);
         }
 
         private Task Log(LogMessage message)

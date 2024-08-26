@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace VersaGabenBot.Ollama
+namespace VersaGabenBot.LLM
 {
     internal class Message
     {
@@ -18,11 +20,19 @@ namespace VersaGabenBot.Ollama
         [JsonPropertyName("images")]
         public List<byte[]> Images { get; private set; }
 
+        [JsonConstructor]
         public Message(Roles role, string content, List<byte[]> images = null)
         {
             Role = role;
             Content = content;
             Images = images;
+        }
+
+        public Message(Roles role, SocketUserMessage message)
+        {
+            Role = role;
+            Content = message.Content;
+            Images = null; // TODO: process attachments.
         }
 
         public override string ToString()

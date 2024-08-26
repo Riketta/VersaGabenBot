@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using VersaGabenBot.Ollama;
+using VersaGabenBot.LLM;
+using VersaGabenBot.Guilds;
 
 namespace VersaGabenBot
 {
@@ -22,7 +24,7 @@ namespace VersaGabenBot
             logger.Info(Console.Title);
 
             OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
-            Bot bot = new Bot(config.BotConfig, ollamaClient);
+            LlmManager llmManager = new LlmManager(config.LlmOptions, ollamaClient);
             GuildManager guildManager = new GuildManager(config.GuildOptions);
 
             // Sample guild registration.
@@ -32,6 +34,7 @@ namespace VersaGabenBot
             //guild.RegisterChannel(293649968865214464);
             //config.Save();
 
+            Bot bot = new Bot(config.BotConfig, llmManager, guildManager);
             await bot.Start();
 
             await Task.Delay(Timeout.Infinite);

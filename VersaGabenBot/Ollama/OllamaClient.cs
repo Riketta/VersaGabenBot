@@ -8,10 +8,12 @@ using Newtonsoft.Json.Converters;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Nodes;
+using VersaGabenBot.LLM;
+using System.Linq;
 
 namespace VersaGabenBot.Ollama
 {
-    internal class OllamaClient
+    internal class OllamaClient : ILlmClient
     {
         private static JsonSerializerOptions serializerOptions = new JsonSerializerOptions
         {
@@ -37,7 +39,17 @@ namespace VersaGabenBot.Ollama
             };
         }
 
-        public async Task<string> GenerateTextAsync(string message)
+        public async Task<Message> GenerateTextAsync(string message)
+        {
+            return await GenerateTextAsync(new Message(Roles.User, message));
+        }
+
+        public async Task<Message> GenerateTextAsync(Message message)
+        {
+            return await GenerateTextAsync([message]);
+        }
+
+        public async Task<Message> GenerateTextAsync(Message[] messages)
         {
             ChatRequest chatRequest = new ChatRequest()
             {
@@ -51,7 +63,7 @@ namespace VersaGabenBot.Ollama
                 Stream = _options.Stream,
                 KeepAlive = _options.KeepAlive,
             };
-            chatRequest.Messages.Add(new Message(Roles.User, message));
+            chatRequest.Messages.AddRange(messages);
 
             string jsonRequest = JsonSerializer.Serialize(chatRequest, serializerOptions);
 
@@ -62,7 +74,7 @@ namespace VersaGabenBot.Ollama
                 throw new HttpRequestException($"Failed to generate text. Request: {response.RequestMessage.RequestUri}; Status code: {response.StatusCode}; Body: {responseJson}.");
 
             var responseData = JsonNode.Parse(responseJson);
-            string llmResponse = responseData["message"]["content"].ToString();
+            Message llmResponse = JsonSerializer.Deserialize<Message>(responseData["message"], serializerOptions) ?? throw new InvalidOperationException();
 
             return llmResponse;
         }

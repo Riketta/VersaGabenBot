@@ -11,6 +11,5 @@ namespace VersaGabenBot.Options
         public string Token { get; set; }
         public uint StatusUpdateInterval { get; set; } = 60 * 60 * 1000;
         public List<string> StatusList { get; set; }
-        public double RandomReplyChance { get; set; } = 0.01f;
     }
 }
