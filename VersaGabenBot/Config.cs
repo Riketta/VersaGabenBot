@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using VersaGabenBot.Options;
 
@@ -12,6 +14,16 @@ namespace VersaGabenBot
 {
     internal class Config
     {
+        private static JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters =
+            {
+                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+            }
+        };
+
         public static readonly string DefaultConfigPath = $"{nameof(VersaGabenBot)}.json";
 
         /// <summary>
@@ -65,7 +77,7 @@ namespace VersaGabenBot
                 throw new ArgumentException($"No config file found: \"{pathToConfig}\"!");
 
             string json = File.ReadAllText(pathToConfig);
-            config = JsonConvert.DeserializeObject<Config>(json) ?? throw new InvalidOperationException();
+            config = JsonSerializer.Deserialize<Config>(json, serializerOptions) ?? throw new InvalidOperationException();
             config.PathToConfig = pathToConfig;
 
             // TODO: initialize default values, migrations and overrides here if required.
@@ -98,7 +110,7 @@ namespace VersaGabenBot
 
         public string ToJson()
         {
-            return JsonConvert.SerializeObject(this, new JsonSerializerSettings() { Formatting = Formatting.Indented, });
+            return JsonSerializer.Serialize(this, serializerOptions);
         }
     }
 }
