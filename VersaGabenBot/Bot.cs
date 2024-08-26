@@ -142,7 +142,8 @@ namespace VersaGabenBot
             Guild guild = _guildManager.GetGuildByChannelUUID(message.Channel.Id);
             if (guild is null) return;
 
-            await _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild);
+            // TODO: fix this hack but without blocking event invoker.
+            await Task.Run(() => _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild).ConfigureAwait(false));
         }
 
         private Task Log(LogMessage message)
