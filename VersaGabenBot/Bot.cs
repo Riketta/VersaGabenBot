@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -128,11 +129,12 @@ namespace VersaGabenBot
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
             if (message.Channel.Id != _config.GeneralChannelID && message.Channel.Id != _config.BotChannelID) return;
 
-            if (message.Channel.Id == _config.GeneralChannelID || message.Channel.Id == _config.BotChannelID)
+            bool isMentioned = message.MentionedUsers.Any(user => user.Id == _client.CurrentUser.Id);
+            if (message.Channel.Id == _config.GeneralChannelID && isMentioned)
             {
                 string llmAnswer = await _ollama.GenerateTextAsync(message.Content);
-                await message.Channel.SendMessageAsync(llmAnswer);
                 logger.Debug(message.Content);
+                await message.ReplyAsync(llmAnswer);
             }
         }
 
