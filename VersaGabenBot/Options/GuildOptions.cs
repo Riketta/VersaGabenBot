@@ -10,7 +10,7 @@ namespace VersaGabenBot.Options
 {
     internal class GuildOptions : IOptions
     {
-        public HashSet<Guild> Guilds { get; set; } = new HashSet<Guild>();
+        public int DatabaseSaveInterval { get; private set; } = 5 * 60 * 1000;
         public uint DefaultMessageHistoryLimitPerChannel { get; private set; } = 100;
     }
 }
