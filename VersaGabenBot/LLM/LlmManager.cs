@@ -24,7 +24,15 @@ namespace VersaGabenBot.LLM
 
         public async Task ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
         {
-            Message llmMessage = new Message(Roles.User, $"{message.Author.Mention}: {message}");
+            string formatted;
+            if (_options.IncludeMessageSender)
+                formatted = _options.MessageWithSenderTemplate
+                    .Replace(_options.SenderPlaceholder, message.Author.Mention)
+                    .Replace(_options.MessagePlaceholder, message.Content);
+            else
+                formatted = message.Content;
+            Message llmMessage = new Message(Roles.User, formatted);
+
             // Store messages in history that not even addressed to bot.
             if (!_options.OnlySaveChatHistoryRelatedToBot)
                 guild.AppendMessage(message.Channel.Id, llmMessage);
