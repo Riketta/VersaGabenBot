@@ -36,7 +36,7 @@ namespace VersaGabenBot.Ollama
             _httpClient = new HttpClient()
             {
                 BaseAddress = new Uri(_options.OllamaApiUrl),
-                Timeout = new TimeSpan(0, 0, 3, 0, 0),
+                Timeout = new TimeSpan(0, 0, 0, _options.HttpClientTimeout, 0),
             };
         }
 
