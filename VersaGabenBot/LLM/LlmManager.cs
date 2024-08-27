@@ -27,7 +27,7 @@ namespace VersaGabenBot.LLM
             string formatted;
             if (_options.IncludeMessageSender)
                 formatted = _options.MessageWithSenderTemplate
-                    .Replace(_options.SenderPlaceholder, message.Author.Mention)
+                    .Replace(_options.SenderPlaceholder, message.Author.GlobalName)
                     .Replace(_options.MessagePlaceholder, message.Content);
             else
                 formatted = message.Content;
