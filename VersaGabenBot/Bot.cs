@@ -142,6 +142,12 @@ namespace VersaGabenBot
             Guild guild = _guildManager.GetGuildByChannelUUID(message.Channel.Id);
             if (guild is null) return;
 
+            if (message.Content.StartsWith("!wipe")) // TODO: implement as a slash command.
+            {
+                guild.ClearChannelHistory(message.Channel.Id);
+                return;
+            }
+
             // TODO: fix this hack but without blocking event invoker.
             await Task.Run(() => _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild).ConfigureAwait(false));
         }
