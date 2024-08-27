@@ -33,7 +33,7 @@ namespace VersaGabenBot.Guilds
 
         public Guild GetGuildByChannelUUID(ulong uuid)
         {
-            return _storage.Guilds.FirstOrDefault(guild => guild.ChannelIDs.Contains(uuid));
+            return _storage.Guilds.FirstOrDefault(guild => guild.IsChannelRegistered(uuid));
         }
 
         public Guild RegisterGuild(ulong guildID)

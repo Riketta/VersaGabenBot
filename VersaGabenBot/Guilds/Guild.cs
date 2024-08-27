@@ -66,5 +66,10 @@ namespace VersaGabenBot.Guilds
         {
             ChannelIDs.Remove(channel);
         }
+
+        public bool IsChannelRegistered(ulong uuid)
+        {
+            return ChannelIDs.Any(channel => channel == uuid);
+        }
     }
 }
