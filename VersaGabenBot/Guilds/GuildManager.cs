@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Guilds
@@ -22,6 +23,11 @@ namespace VersaGabenBot.Guilds
         }
 
         private async void TimerTask(object timerState)
+        {
+            await SaveDatabase();
+        }
+
+        public async Task SaveDatabase()
         {
             await _storage.Save();
         }
