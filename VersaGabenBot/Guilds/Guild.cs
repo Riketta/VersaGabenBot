@@ -21,7 +21,7 @@ namespace VersaGabenBot.Guilds
         public ulong BotChannelID { get; set; }
 
         [JsonInclude]
-        public HashSet<ulong> ChannelIDs { get; private set; } = new HashSet<ulong>();
+        private HashSet<ulong> ChannelIDs { get; set; } = new HashSet<ulong>();
 
         [JsonInclude]
         public uint MessageHistoryLimit { get; set; } = 100;
@@ -47,6 +47,14 @@ namespace VersaGabenBot.Guilds
 
             if (MessageHistoryPerChannel[channel].Count > MessageHistoryLimit)
                 MessageHistoryPerChannel[channel].TryDequeue(out Message _);
+        }
+
+        public void ClearChannelHistory(ulong channel)
+        {
+            if (!MessageHistoryPerChannel.ContainsKey(channel))
+                return;
+
+            MessageHistoryPerChannel[channel].Clear();
         }
 
         public void RegisterChannel(ulong channel)
