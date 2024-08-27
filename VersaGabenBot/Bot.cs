@@ -142,9 +142,15 @@ namespace VersaGabenBot
             Guild guild = _guildManager.GetGuildByChannelUUID(message.Channel.Id);
             if (guild is null) return;
 
-            if (message.Content.StartsWith("!wipe")) // TODO: implement as a slash command.
+            // TODO: implement as a slash commands.
+            if (message.Content.StartsWith("!wipe"))
             {
                 guild.ClearChannelHistory(message.Channel.Id);
+                return;
+            }
+            else if (message.Content.StartsWith("!save"))
+            {
+                await _guildManager.SaveDatabase();
                 return;
             }
 
