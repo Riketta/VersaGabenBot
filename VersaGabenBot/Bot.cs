@@ -139,6 +139,8 @@ namespace VersaGabenBot
             if (msg is not SocketUserMessage message) return;
             if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
 
+            // If the guild is not found, the message channel is not registered and should not be processed further.
+            // An exception is a request to register a channel from a person with such rights.
             Guild guild = _guildManager.GetGuildByChannelUUID(message.Channel.Id);
             if (guild is null) return;
 
