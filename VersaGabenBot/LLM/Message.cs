@@ -35,6 +35,27 @@ namespace VersaGabenBot.LLM
             Images = null; // TODO: process attachments.
         }
 
+        public void RemoveConsecutiveEmptyLines(int maxEmptyLines = 1)
+        {
+            StringBuilder sb = new StringBuilder(Content.Length);
+            int emptyLineCount = 0;
+
+            foreach (string line in Content.Split('\n'))
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    emptyLineCount++;
+                    if (emptyLineCount <= maxEmptyLines)
+                        sb.Append('\n');
+                }
+                else
+                {
+                    emptyLineCount = 0;
+                    sb.Append(line).Append('\n');
+                }
+
+            Content = sb.ToString().TrimEnd();
+        }
+
         public override string ToString()
         {
             return $"{Role.ToString().ToUpper()} \"\"\"{Content}\"\"\"";

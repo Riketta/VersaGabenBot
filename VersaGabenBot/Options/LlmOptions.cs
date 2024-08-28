@@ -12,6 +12,8 @@ namespace VersaGabenBot.Options
         public string SenderPlaceholder { get; set; } = "{sender}";
         public string MessagePlaceholder { get; set; } = "{message}";
         public string MessageWithSenderTemplate { get; set; } = "{sender}: {message}";
+        public bool RemoveEmptyLines { get; set; } = false;
+        public int MaxEmptyLines { get; set; } = 1;
         public bool OnlySaveChatHistoryRelatedToBot { get; set; } = false;
         public double RandomReplyChance { get; set; } = 0.01f;
     }
