@@ -20,15 +20,15 @@ namespace VersaGabenBot.LLM
         {
             _options = options;
             _client = client;
-        }
+        } 
 
         public async Task ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
         {
             string formatted;
             if (_options.IncludeMessageSender)
                 formatted = _options.MessageWithSenderTemplate
-                    .Replace(_options.SenderPlaceholder, message.Author.GlobalName)
-                    .Replace(_options.MessagePlaceholder, message.Content);
+                    .Replace(_options.SenderPlaceholder, message.Author.GlobalName ?? message.Author.Username)
+                    .Replace(_options.MessagePlaceholder, message.CleanContent);
             else
                 formatted = message.Content;
             Message llmMessage = new Message(Roles.User, formatted);
