@@ -11,7 +11,7 @@ namespace VersaGabenBot.Guilds
         private readonly Storage _storage; // TODO: turn to property and add lock?
         private readonly Timer _timer;
 
-        public GuildManager(GuildOptions guildOptions) // TODO: do not use config as storage.
+        public GuildManager(GuildOptions guildOptions)
         {
             _options = guildOptions;
             _storage = Storage.Load().Result;
