@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <None Update="VersaGabenBot.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
