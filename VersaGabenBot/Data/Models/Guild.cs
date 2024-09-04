@@ -18,7 +18,7 @@ namespace VersaGabenBot.Data.Models
         public GuildOptions Options { get; private set; } = new GuildOptions();
 
         [JsonInclude]
-        public List<string> BotNames { get; private set; }
+        public List<string> AssociatedBotNames { get; private set; }
 
         [JsonInclude]
         public ulong BotChannelID { get; set; }
