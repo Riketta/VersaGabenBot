@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using VersaGabenBot.LLM;
-using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Data.Models
 {
