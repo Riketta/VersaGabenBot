@@ -14,7 +14,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using VersaGabenBot.Contexts;
 using VersaGabenBot.Data.Models;
-using VersaGabenBot.Guilds;
+using VersaGabenBot.Data.Repositories;
 using VersaGabenBot.LLM;
 using VersaGabenBot.Ollama;
 using VersaGabenBot.Options;

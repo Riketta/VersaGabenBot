@@ -5,7 +5,7 @@ using VersaGabenBot.Contexts;
 using VersaGabenBot.Data.Models;
 using VersaGabenBot.Options;
 
-namespace VersaGabenBot.Guilds
+namespace VersaGabenBot.Data.Repositories
 {
     internal class GuildRepository
     {

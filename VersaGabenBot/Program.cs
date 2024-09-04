@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using VersaGabenBot.Ollama;
 using VersaGabenBot.LLM;
-using VersaGabenBot.Guilds;
 using VersaGabenBot.Contexts;
+using VersaGabenBot.Data.Repositories;
 
 namespace VersaGabenBot
 {
