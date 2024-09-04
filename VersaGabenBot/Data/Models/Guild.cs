@@ -13,13 +13,13 @@ namespace VersaGabenBot.Data.Models
     internal class Guild
     {
         [JsonInclude]
+        public ulong ID { get; private set; }
+
+        [JsonInclude]
         public GuildOptions Options { get; private set; } = new GuildOptions();
 
         [JsonInclude]
         public List<string> BotNames { get; private set; }
-
-        [JsonInclude]
-        public ulong ID { get; private set; }
 
         [JsonInclude]
         public ulong BotChannelID { get; set; }
