@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VersaGabenBot
 {
-    internal interface IStorage
+    internal interface IDatabase
     {
         public Task Save();
     }

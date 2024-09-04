@@ -8,11 +8,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using VersaGabenBot.Options;
 using System.IO;
-using VersaGabenBot.Guilds;
+using VersaGabenBot.Data.Models;
+using System.Threading;
 
 namespace VersaGabenBot
 {
-    internal class Storage
+    internal class Database
     {
         private static JsonSerializerOptions serializerOptions = new JsonSerializerOptions
         {
@@ -26,26 +27,40 @@ namespace VersaGabenBot
 
         public static readonly string DefaultStoragePath = $"{nameof(VersaGabenBot)}DB.json";
 
+        public int DatabaseSaveInterval { get; set; } = 5 * 60 * 1000;
+
         #region Storage Fields
         public HashSet<Guild> Guilds { get; set; } = new HashSet<Guild>();
         #endregion
 
-        public async static Task<Storage> Load()
+        private readonly Timer _timer;
+
+        [JsonConstructor]
+        private Database()
         {
-            Storage storage;
+            _timer = new Timer(
+                callback: new TimerCallback(TimerTask),
+                state: null,
+                dueTime: DatabaseSaveInterval,
+                period: DatabaseSaveInterval);
+        }
+
+        public async static Task<Database> Load()
+        {
+            Database database;
             bool freshStorage = !File.Exists(DefaultStoragePath);
 
             if (freshStorage)
-                storage = new Storage();
+                database = new Database();
             else
                 using (var fileStream = new FileStream(DefaultStoragePath, FileMode.OpenOrCreate, FileAccess.Read))
-                    storage = await JsonSerializer.DeserializeAsync<Storage>(fileStream, serializerOptions) ?? throw new InvalidOperationException();
+                    database = await JsonSerializer.DeserializeAsync<Database>(fileStream, serializerOptions) ?? throw new InvalidOperationException();
 
             // TODO: initialize default values, migrations and overrides here if required.
 
-            await storage.Save(); // Re-save to add new or missing fields.
+            await database.Save(); // Re-save to add new or missing fields.
 
-            return storage;
+            return database;
         }
 
         public async Task Save()
@@ -56,6 +71,16 @@ namespace VersaGabenBot
 
             using var fileStream = new FileStream(DefaultStoragePath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
+        }
+
+        private async void TimerTask(object timerState)
+        {
+            await SaveDatabase();
+        }
+
+        public async Task SaveDatabase()
+        {
+            await Save();
         }
     }
 }

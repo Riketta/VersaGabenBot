@@ -1,55 +1,38 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using VersaGabenBot.Data.Models;
 using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Guilds
 {
     internal class GuildManager
     {
-        private readonly GuildOptions _options;
-        private readonly Storage _storage; // TODO: turn to property and add lock?
-        private readonly Timer _timer;
+        private readonly Database _db;
 
-        public GuildManager(GuildOptions guildOptions)
+        public GuildManager(Database database)
         {
-            _options = guildOptions;
-            _storage = Storage.Load().Result;
-            _timer = new Timer(
-                callback: new TimerCallback(TimerTask),
-                state: null,
-                dueTime: _options.DatabaseSaveInterval,
-                period: _options.DatabaseSaveInterval);
-        }
-
-        private async void TimerTask(object timerState)
-        {
-            await SaveDatabase();
-        }
-
-        public async Task SaveDatabase()
-        {
-            await _storage.Save();
+            _db = database;
         }
 
         public Guild GetGuildByUUID(ulong uuid)
         {
-            return _storage.Guilds.FirstOrDefault(guild => guild.ID == uuid);
+            return _db.Guilds.FirstOrDefault(guild => guild.ID == uuid);
         }
 
         public Guild GetGuildByChannelUUID(ulong uuid)
         {
-            return _storage.Guilds.FirstOrDefault(guild => guild.IsChannelRegistered(uuid));
+            return _db.Guilds.FirstOrDefault(guild => guild.IsChannelRegistered(uuid));
         }
 
         public Guild RegisterGuild(ulong guildID)
         {
-            Guild guild = _storage.Guilds.FirstOrDefault(guild => guild.ID == guildID);
+            Guild guild = _db.Guilds.FirstOrDefault(guild => guild.ID == guildID);
             if (guild is not null)
                 return guild;
 
-            guild = new Guild(guildID, _options.DefaultMessageHistoryLimitPerChannel);
-            _storage.Guilds.Add(guild);
+            guild = new Guild(guildID);
+            _db.Guilds.Add(guild);
 
             return guild;
         }

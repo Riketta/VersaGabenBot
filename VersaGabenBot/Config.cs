@@ -34,8 +34,7 @@ namespace VersaGabenBot
 
         #region Config Fields
         public BotConfig BotConfig { get; set; } = new BotConfig();
-        public GuildOptions GuildOptions { get; set; } = new GuildOptions();
-        public LlmOptions LlmOptions { get; set; } = new LlmOptions();
+        public LlmOptionsGlobal LlmOptions { get; set; } = new LlmOptionsGlobal();
         public OllamaOptions OllamaOptions { get; set; } = new OllamaOptions();
         #endregion
 

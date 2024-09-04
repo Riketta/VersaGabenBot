@@ -6,11 +6,15 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using VersaGabenBot.LLM;
+using VersaGabenBot.Options;
 
-namespace VersaGabenBot.Guilds
+namespace VersaGabenBot.Data.Models
 {
     internal class Guild
     {
+        [JsonInclude]
+        public GuildOptions Options { get; private set; } = new GuildOptions();
+
         [JsonInclude]
         public List<string> BotNames { get; private set; }
 
@@ -24,18 +28,14 @@ namespace VersaGabenBot.Guilds
         private HashSet<ulong> ChannelIDs { get; set; } = new HashSet<ulong>();
 
         [JsonInclude]
-        public uint MessageHistoryLimit { get; set; } = 100;
-
-        [JsonInclude]
         public ConcurrentDictionary<ulong, ConcurrentQueue<Message>> MessageHistoryPerChannel { get; private set; } = new();
 
         [JsonConstructor]
         public Guild() { }
 
-        public Guild(ulong id, uint messageHistoryLimit)
+        public Guild(ulong id)
         {
             ID = id;
-            MessageHistoryLimit = messageHistoryLimit;
         }
 
         public void AppendMessage(ulong channel, Message message)
@@ -45,7 +45,7 @@ namespace VersaGabenBot.Guilds
 
             MessageHistoryPerChannel[channel].Enqueue(message);
 
-            if (MessageHistoryPerChannel[channel].Count > MessageHistoryLimit)
+            if (MessageHistoryPerChannel[channel].Count > Options.MessageHistoryLimitPerChannel)
                 MessageHistoryPerChannel[channel].TryDequeue(out Message _);
         }
 

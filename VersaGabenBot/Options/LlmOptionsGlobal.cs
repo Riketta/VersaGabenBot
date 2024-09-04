@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VersaGabenBot.Options
 {
-    internal class LlmOptions : IOptions
+    internal class LlmOptionsGlobal : IOptions
     {
         public bool IncludeMessageSender { get; set; } = false;
         public string SenderPlaceholder { get; set; } = "{sender}";
@@ -14,7 +14,5 @@ namespace VersaGabenBot.Options
         public string MessageWithSenderTemplate { get; set; } = "{sender}: {message}";
         public bool RemoveEmptyLines { get; set; } = false;
         public int MaxEmptyLines { get; set; } = 1;
-        public bool OnlySaveChatHistoryRelatedToBot { get; set; } = false;
-        public double RandomReplyChance { get; set; } = 0.01f;
     }
 }

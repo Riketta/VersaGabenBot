@@ -12,6 +12,7 @@ using System.Timers;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using VersaGabenBot.Data.Models;
 using VersaGabenBot.Guilds;
 using VersaGabenBot.LLM;
 using VersaGabenBot.Ollama;
@@ -28,14 +29,16 @@ namespace VersaGabenBot
         private readonly Timer statusTimer = new Timer();
 
         private readonly BotConfig _config;
+        private readonly Database _db;
         private readonly LlmManager _llmManager;
         private readonly GuildManager _guildManager;
 
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config, LlmManager llmManager, GuildManager guildManager)
+        public Bot(BotConfig config, Database db, LlmManager llmManager, GuildManager guildManager)
         {
             _config = config;
+            _db = db;
             _llmManager = llmManager;
             _guildManager = guildManager;
         }
@@ -152,7 +155,7 @@ namespace VersaGabenBot
             }
             else if (message.Content.StartsWith("!save"))
             {
-                await _guildManager.SaveDatabase();
+                await _db.SaveDatabase();
                 return;
             }
 
