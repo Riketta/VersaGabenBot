@@ -12,6 +12,7 @@ using System.Timers;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using VersaGabenBot.Contexts;
 using VersaGabenBot.Data.Models;
 using VersaGabenBot.Guilds;
 using VersaGabenBot.LLM;
@@ -31,11 +32,11 @@ namespace VersaGabenBot
         private readonly BotConfig _config;
         private readonly Database _db;
         private readonly LlmManager _llmManager;
-        private readonly GuildManager _guildManager;
+        private readonly GuildRepository _guildManager;
 
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config, Database db, LlmManager llmManager, GuildManager guildManager)
+        public Bot(BotConfig config, Database db, LlmManager llmManager, GuildRepository guildManager)
         {
             _config = config;
             _db = db;

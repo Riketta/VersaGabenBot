@@ -7,6 +7,7 @@ using System.IO;
 using VersaGabenBot.Ollama;
 using VersaGabenBot.LLM;
 using VersaGabenBot.Guilds;
+using VersaGabenBot.Contexts;
 
 namespace VersaGabenBot
 {
@@ -26,7 +27,7 @@ namespace VersaGabenBot
 
             OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
             LlmManager llmManager = new LlmManager(config.LlmOptions, ollamaClient);
-            GuildManager guildManager = new GuildManager(database);
+            GuildRepository guildManager = new GuildRepository(database);
 
             // Sample guild registration.
             //Guild guild = guildManager.RegisterGuild(293649968865214464);

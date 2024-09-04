@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VersaGabenBot
+namespace VersaGabenBot.Contexts
 {
     internal interface IDatabase
     {

@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using VersaGabenBot.Contexts;
 using VersaGabenBot.Data.Models;
 using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Guilds
 {
-    internal class GuildManager
+    internal class GuildRepository
     {
         private readonly Database _db;
 
-        public GuildManager(Database database)
+        public GuildRepository(Database database)
         {
             _db = database;
         }

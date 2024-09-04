@@ -11,7 +11,7 @@ using System.IO;
 using VersaGabenBot.Data.Models;
 using System.Threading;
 
-namespace VersaGabenBot
+namespace VersaGabenBot.Contexts
 {
     internal class Database
     {
