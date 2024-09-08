@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VersaGabenBot.Options
 {
-    internal class LlmOptionsGlobal : IOptions
+    internal class LlmOptions : IOptions
     {
         public bool IncludeMessageSender { get; set; } = false;
         public string SenderPlaceholder { get; set; } = "{sender}";

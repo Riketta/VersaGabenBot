@@ -13,10 +13,10 @@ namespace VersaGabenBot.LLM
 {
     internal class LlmManager
     {
-        private readonly LlmOptionsGlobal _options;
+        private readonly LlmOptions _options;
         private readonly ILlmClient _client;
 
-        public LlmManager(LlmOptionsGlobal options, ILlmClient client)
+        public LlmManager(LlmOptions options, ILlmClient client)
         {
             _options = options;
             _client = client;
