@@ -22,10 +22,10 @@ namespace VersaGabenBot.LLM
             _client = client;
         }
 
-        public async Task ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
+        public async Task<string> ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
         {
             if (string.IsNullOrEmpty(message.CleanContent)) // TODO: process attachments.
-                return;
+                return null;
 
             string formatted;
             if (_options.IncludeMessageSender)
@@ -44,7 +44,7 @@ namespace VersaGabenBot.LLM
             bool isMentioned = message.MentionedUsers.Any(user => user.Id == currentUser.Id);
 
             if (!isMentioned && !isRandomReply)
-                return;
+                return null;
 
             using IDisposable typing = message.Channel.EnterTypingState();
 
@@ -55,7 +55,7 @@ namespace VersaGabenBot.LLM
                 response.RemoveConsecutiveEmptyLines(_options.MaxEmptyLines);
             guild.AppendMessage(message.Channel.Id, response);
 
-            await message.ReplyAsync(response.Content);
+            return response.Content;
         }
     }
 }
