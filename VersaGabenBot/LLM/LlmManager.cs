@@ -24,6 +24,9 @@ namespace VersaGabenBot.LLM
 
         public async Task ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
         {
+            if (string.IsNullOrEmpty(message.CleanContent)) // TODO: process attachments.
+                return;
+
             string formatted;
             if (_options.IncludeMessageSender)
                 formatted = _options.MessageWithSenderTemplate
