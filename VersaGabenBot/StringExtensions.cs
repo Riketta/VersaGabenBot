@@ -27,6 +27,7 @@ namespace VersaGabenBot
                 currentLength += line.Length;
                 sb.Append(line).Append('\n');
             }
+            result.Add(sb.ToString());
 
             return result.ToArray();
         }
