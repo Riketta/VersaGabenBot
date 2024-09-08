@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VersaGabenBot.Guilds;
 using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Data.Models
