@@ -160,8 +160,16 @@ namespace VersaGabenBot
                 return;
             }
 
-            // TODO: fix this hack but without blocking event invoker.
-            await Task.Run(() => _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild).ConfigureAwait(false));
+            async Task blockingTask() // This task should not be awaited.
+            {
+                string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild);
+                string[] messages = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);
+
+                if (messages is not null && messages.Length > 0)
+                    foreach (var msg in messages)
+                        await message.ReplyAsync(msg);
+            }
+            _ = Task.Run(blockingTask);
         }
 
         private Task Log(LogMessage message)
