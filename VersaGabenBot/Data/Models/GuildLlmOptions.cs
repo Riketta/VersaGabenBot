@@ -9,6 +9,7 @@ namespace VersaGabenBot.Data.Models
 {
     internal class GuildLlmOptions : IOptions
     {
+        public int MessagesContextSize { get; set; } = 100;
         public bool OnlySaveChatHistoryRelatedToBot { get; set; } = false;
         public double RandomReplyChance { get; set; } = 0.01f;
     }
