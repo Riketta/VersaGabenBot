@@ -50,7 +50,7 @@ namespace VersaGabenBot.LLM
                 else
                 {
                     emptyLineCount = 0;
-                    sb.Append(line).Append('\n');
+                    sb.Append(line.TrimEnd()).Append('\n'); // TODO: is this TrimEnd required?
                 }
 
             Content = sb.ToString().TrimEnd();
