@@ -10,7 +10,7 @@ namespace VersaGabenBot.Data.Models
 {
     internal class GuildOptions : IOptions
     {
-        public LlmOptionsGuild LlmOptions { get; set; } = new LlmOptionsGuild();
+        public GuildLlmOptions LlmOptions { get; set; } = new GuildLlmOptions();
         public uint MessageHistoryLimitPerChannel { get; set; } = 300;
     }
 }
