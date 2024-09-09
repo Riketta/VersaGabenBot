@@ -50,7 +50,10 @@ namespace VersaGabenBot.LLM
 
             if (guild.Options.LlmOptions.OnlySaveChatHistoryRelatedToBot)
                 guild.AppendMessage(message.Channel.Id, llmMessage);
-            Message response = await _client.GenerateTextAsync(guild.MessageHistoryPerChannel[message.Channel.Id].Take(guild.Options.LlmOptions.MessagesContextSize).ToArray());
+
+            var messages = guild.MessageHistoryPerChannel[message.Channel.Id].Take(guild.Options.LlmOptions.MessagesContextSize);
+            Message response = await _client.GenerateTextAsync(messages);
+
             if (_options.RemoveEmptyLines)
                 response.RemoveConsecutiveEmptyLines(_options.MaxEmptyLines);
             guild.AppendMessage(message.Channel.Id, response);

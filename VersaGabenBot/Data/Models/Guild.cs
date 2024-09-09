@@ -56,7 +56,7 @@ namespace VersaGabenBot.Data.Models
             MessageHistoryPerChannel[channel].Clear();
         }
 
-        public void RegisterChannel(ulong channel)
+        public void RegisterChannel(ulong channel) 
         {
             ChannelIDs.Add(channel);
         }
