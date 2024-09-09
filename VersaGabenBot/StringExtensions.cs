@@ -31,5 +31,26 @@ namespace VersaGabenBot
 
             return result.ToArray();
         }
+
+        public static string RemoveConsecutiveEmptyLines(this string str, int maxEmptyLines)
+        {
+            StringBuilder sb = new StringBuilder(str.Length);
+            int emptyLineCount = 0;
+
+            foreach (string line in str.Split('\n'))
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    emptyLineCount++;
+                    if (emptyLineCount <= maxEmptyLines)
+                        sb.Append('\n');
+                }
+                else
+                {
+                    emptyLineCount = 0;
+                    sb.Append(line.TrimEnd()).Append('\n'); // TODO: is this TrimEnd required?
+                }
+
+            return sb.ToString().TrimEnd();
+        }
     }
 }
