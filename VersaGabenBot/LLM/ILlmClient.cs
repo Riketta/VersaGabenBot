@@ -10,6 +10,6 @@ namespace VersaGabenBot.LLM
     {
         public Task<Message> GenerateTextAsync(string message);
         public Task<Message> GenerateTextAsync(Message message);
-        public Task<Message> GenerateTextAsync(Message[] messages);
+        public Task<Message> GenerateTextAsync(IEnumerable<Message> messages);
     }
 }

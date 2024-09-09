@@ -50,7 +50,7 @@ namespace VersaGabenBot.Ollama
             return await GenerateTextAsync([message]);
         }
 
-        public async Task<Message> GenerateTextAsync(Message[] messages)
+        public async Task<Message> GenerateTextAsync(IEnumerable<Message> messages)
         {
             ChatRequest chatRequest = new ChatRequest()
             {
