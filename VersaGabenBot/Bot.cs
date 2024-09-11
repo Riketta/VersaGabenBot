@@ -29,6 +29,7 @@ namespace VersaGabenBot
         private readonly Random random = new Random();
         private readonly Timer statusTimer = new Timer();
 
+        private readonly DiscordSocketClient _client;
         private readonly BotConfig _config;
         private readonly Database _db;
         private readonly LlmManager _llmManager;
@@ -38,6 +39,13 @@ namespace VersaGabenBot
 
         public Bot(BotConfig config, Database db, LlmManager llmManager, GuildRepository guildManager)
         {
+            _client = new DiscordSocketClient(new DiscordSocketConfig
+            {
+                LogLevel = LogSeverity.Info,
+                MessageCacheSize = 50,
+                GatewayIntents = GatewayIntents.All,
+            });
+
             _config = config;
             _db = db;
             _llmManager = llmManager;
