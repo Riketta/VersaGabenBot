@@ -36,11 +36,11 @@ namespace VersaGabenBot
         private readonly BotConfig _config;
         private readonly Database _db;
         private readonly LlmManager _llmManager;
-        private readonly GuildRepository _guildManager;
+        private readonly GuildRepository _guildRepository;
 
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config, Database db, LlmManager llmManager, GuildRepository guildManager)
+        public Bot(BotConfig config, Database db, LlmManager llmManager, GuildRepository guildRepository)
         {
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -50,14 +50,14 @@ namespace VersaGabenBot
             });
             List<ICommand> commands = new List<ICommand>()
             {
-                new StatusCommand(guildManager),
+                new StatusCommand(guildRepository),
             };
             _commandHandler = new CommandHandler(_client, commands);
 
             _config = config;
             _db = db;
             _llmManager = llmManager;
-            _guildManager = guildManager;
+            _guildRepository = guildRepository;
         }
 
         // Keep the CommandService and DI container around for use with commands.
@@ -97,7 +97,7 @@ namespace VersaGabenBot
 
         private async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
         {
-            Guild guild = _guildManager.GetGuildByChannelUUID(channel.Id);
+            Guild guild = _guildRepository.GetGuildByChannelUUID(channel.Id);
             if (guild is null) return;
 
             string message = string.Format("[InviteDeleted] \"{0}\" for \"{1}\"", code, channel?.Name ?? "-");
@@ -107,7 +107,7 @@ namespace VersaGabenBot
 
         private async Task Client_InviteCreated(SocketInvite invite)
         {
-            Guild guild = _guildManager.GetGuildByChannelUUID(invite.Guild.Id);
+            Guild guild = _guildRepository.GetGuildByChannelUUID(invite.Guild.Id);
             if (guild is null) return;
 
             string message = string.Format("[InviteCreated] \"{0}\" (\"{1}\"): \"{2}\" for \"{3}\"", invite.Inviter.Username, invite.Inviter.Nickname ?? "-", invite.Code, invite.TargetUser?.Username ?? "-");
@@ -117,7 +117,7 @@ namespace VersaGabenBot
 
         private async Task Client_UserLeft(SocketGuild socketGuild, SocketUser user)
         {
-            Guild guild = _guildManager.GetGuildByChannelUUID(socketGuild.Id);
+            Guild guild = _guildRepository.GetGuildByChannelUUID(socketGuild.Id);
             if (guild is null) return;
 
             string message = string.Format("[UserLeft] \"{0}\"", user.Username);
@@ -127,7 +127,7 @@ namespace VersaGabenBot
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            Guild guild = _guildManager.GetGuildByChannelUUID(user.Guild.Id);
+            Guild guild = _guildRepository.GetGuildByChannelUUID(user.Guild.Id);
             if (guild is null) return;
 
             string message = string.Format("[UserJoined] \"{0}\"", user.Username);
@@ -155,7 +155,7 @@ namespace VersaGabenBot
 
             // If the guild is not found, the message channel is not registered and should not be processed further.
             // An exception is a request to register a channel from a person with such rights.
-            Guild guild = _guildManager.GetGuildByChannelUUID(message.Channel.Id);
+            Guild guild = _guildRepository.GetGuildByChannelUUID(message.Channel.Id);
             if (guild is null) return;
 
             // TODO: implement as a slash commands.
