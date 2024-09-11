@@ -12,6 +12,7 @@ using System.Timers;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using VersaGabenBot.Commands;
 using VersaGabenBot.Contexts;
 using VersaGabenBot.Data.Models;
 using VersaGabenBot.Data.Repositories;
@@ -30,6 +31,8 @@ namespace VersaGabenBot
         private readonly Timer statusTimer = new Timer();
 
         private readonly DiscordSocketClient _client;
+        private readonly CommandHandler _commandHandler;
+
         private readonly BotConfig _config;
         private readonly Database _db;
         private readonly LlmManager _llmManager;
@@ -45,21 +48,17 @@ namespace VersaGabenBot
                 MessageCacheSize = 50,
                 GatewayIntents = GatewayIntents.All,
             });
+            List<ICommand> commands = new List<ICommand>()
+            {
+                new StatusCommand(guildManager),
+            };
+            _commandHandler = new CommandHandler(_client, commands);
 
             _config = config;
             _db = db;
             _llmManager = llmManager;
             _guildManager = guildManager;
         }
-
-        private readonly DiscordSocketClient _client = new DiscordSocketClient(new DiscordSocketConfig
-        {
-            // How much logging do you want to see?
-            LogLevel = LogSeverity.Info,
-            MessageCacheSize = 50,
-            GatewayIntents = GatewayIntents.All,
-            //WebSocketProvider = WS4NetProvider.Instance
-        });
 
         // Keep the CommandService and DI container around for use with commands.
         // These two types require you install the Discord.Net.Commands package.
@@ -71,6 +70,9 @@ namespace VersaGabenBot
 
         public async Task Start()
         {
+            _client.Ready += _commandHandler.RegisterCommands;
+            _client.SlashCommandExecuted += _commandHandler.HandleCommands;
+
             _client.Log += Log;
             _client.MessageReceived += Client_MessageReceived;
             _client.UserJoined += Client_UserJoined;
