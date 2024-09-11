@@ -2,6 +2,7 @@
 using Discord.Rest;
 using Discord.WebSocket;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,11 +40,17 @@ namespace VersaGabenBot.Commands
         {
             ulong channelId = command.ChannelId.Value;
             Guild guild = _guildRepository.GetGuildByChannelUUID(channelId);
+            if (guild is null)
+                return;
+
+            ConcurrentQueue<Message> channelHistory = null;
+            if (guild.MessageHistoryPerChannel.TryGetValue(channelId, out ConcurrentQueue<Message> value))
+                channelHistory = value;
 
             string[] reports =
             [
-                $"Current history length: {guild.MessageHistoryPerChannel[channelId].Count}.",
-                $"LLM history length: {guild.MessageHistoryPerChannel[channelId].TakeLast(guild.Options.LlmOptions.MessagesContextSize).Count()}.",
+                $"Current history length: {(channelHistory is null ? 0 : channelHistory.Count)}.",
+                $"LLM history length: {(channelHistory is null ? 0 : channelHistory.TakeLast(guild.Options.LlmOptions.MessagesContextSize)?.Count() ?? 0)}.",
             ];
 
             var embed = new EmbedBuilder()
