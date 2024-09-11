@@ -32,6 +32,7 @@ namespace VersaGabenBot
                     var commandProps = command.Prepare();
                     if (command is IGlobalCommand globalCommand)
                     {
+                        await _client.CreateGlobalApplicationCommandAsync(commandProps); // TODO: Call ONCE per command. Track command registration statuses in DB.
                         RestGlobalCommand restGlobalCommand = await _client.Rest.CreateGlobalCommand(commandProps);
                         globalCommand.RestGlobalCommand = restGlobalCommand; // TODO: fix excessive property accessibility.
                     }
