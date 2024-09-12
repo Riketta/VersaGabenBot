@@ -16,14 +16,16 @@ namespace VersaGabenBot.Commands
     internal class StatusCommand : IGlobalCommand
     {
         private readonly GuildRepository _guildRepository;
+        private readonly ChannelRepository _channelRepository;
 
         public string Name => "status";
         public RestGlobalCommand RestGlobalCommand { get; set; }
         public RestApplicationCommand RestApplicationCommand => RestGlobalCommand;
 
-        public StatusCommand(GuildRepository guildRepository)
+        public StatusCommand(GuildRepository guildRepository, ChannelRepository channelRepository)
         {
             _guildRepository = guildRepository;
+            _channelRepository = channelRepository;
         }
 
         public SlashCommandProperties Prepare()
@@ -39,18 +41,16 @@ namespace VersaGabenBot.Commands
         public async Task Handle(SocketSlashCommand command)
         {
             ulong channelId = command.ChannelId.Value;
-            Guild guild = _guildRepository.GetGuildByChannelUUID(channelId);
-            if (guild is null)
+            if (!await _guildRepository.IsGuildRegistered(channelId))
                 return;
 
-            ConcurrentQueue<Message> channelHistory = null;
-            if (guild.MessageHistoryPerChannel.TryGetValue(channelId, out ConcurrentQueue<Message> value))
-                channelHistory = value;
+            var messagesCount = await _channelRepository.GetMessagesCount(channelId);
+            var maxLlmMessagesCount = (await _guildRepository.GetGuildLlmOptions(channelId)).MessagesContextSize;
 
             string[] reports =
             [
-                $"Current history length: {(channelHistory is null ? 0 : channelHistory.Count)}.",
-                $"LLM history length: {(channelHistory is null ? 0 : channelHistory.TakeLast(guild.Options.LlmOptions.MessagesContextSize)?.Count() ?? 0)}.",
+                $"Current history length: {messagesCount}.",
+                $"LLM history length: {Math.Min(messagesCount, maxLlmMessagesCount)}.",
             ];
 
             var embed = new EmbedBuilder()

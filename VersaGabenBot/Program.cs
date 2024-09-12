@@ -21,7 +21,12 @@ namespace VersaGabenBot
         public async Task MainAsync()
         {
             var config = Config.LoadOrCreateDefault(Config.DefaultConfigPath);
-            var database = await Database.Load(); // TODO: make thread safe?
+
+            var dbContext = new DatabaseContext(config.DatabaseConfig);
+            DatabaseInitializer dbInitializer = new DatabaseInitializer(dbContext);
+            dbInitializer.Initialize();
+            GuildRepository guildRepository = new GuildRepository(dbContext);
+            ChannelRepository channelRepository = new ChannelRepository(dbContext);
 
             var assemblyName = Assembly.GetEntryAssembly().GetName();
             Console.Title = string.Format("{0} ver. {1}", assemblyName.Name, assemblyName.Version);
@@ -29,16 +34,8 @@ namespace VersaGabenBot
 
             OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
             LlmManager llmManager = new LlmManager(config.LlmOptions, ollamaClient);
-            GuildRepository guildManager = new GuildRepository(database);
 
-            // Sample guild registration.
-            //Guild guild = guildManager.RegisterGuild(293649968865214464);
-            //guild.BotChannelID = 649913439556206592;
-            //guild.RegisterChannel(guild.BotChannelID);
-            //guild.RegisterChannel(293649968865214464);
-            //config.Save();
-
-            Bot bot = new Bot(config.BotConfig, database, llmManager, guildManager);
+            Bot bot = new Bot(config.BotConfig, dbContext, llmManager, guildRepository, channelRepository);
             await bot.Start();
 
             await Task.Delay(Timeout.Infinite);

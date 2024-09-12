@@ -40,22 +40,22 @@ namespace VersaGabenBot.Ollama
             };
         }
 
-        public async Task<Message> GenerateTextAsync(string message)
+        public async Task<LlmMessage> GenerateTextAsync(string message)
         {
-            return await GenerateTextAsync(new Message(Roles.User, message));
+            return await GenerateTextAsync(new LlmMessage(Roles.User, message));
         }
 
-        public async Task<Message> GenerateTextAsync(Message message)
+        public async Task<LlmMessage> GenerateTextAsync(LlmMessage message)
         {
             return await GenerateTextAsync([message]);
         }
 
-        public async Task<Message> GenerateTextAsync(IEnumerable<Message> messages)
+        public async Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages)
         {
             ChatRequest chatRequest = new ChatRequest()
             {
                 Model = _options.Model,
-                Messages = new List<Message>(_options.SetupMessages),
+                Messages = new List<LlmMessage>(_options.SetupMessages),
                 ModelfileOptions = new ModelfileOptions()
                 {
                     ContextWindow = _options.ContextWindow,
@@ -75,7 +75,7 @@ namespace VersaGabenBot.Ollama
                 throw new HttpRequestException($"Failed to generate text. Request: {response.RequestMessage.RequestUri}; Status code: {response.StatusCode}; Body: {responseJson}.");
 
             var responseData = JsonNode.Parse(responseJson);
-            Message llmResponse = JsonSerializer.Deserialize<Message>(responseData["message"], serializerOptions) ?? throw new InvalidOperationException();
+            LlmMessage llmResponse = JsonSerializer.Deserialize<LlmMessage>(responseData["message"], serializerOptions) ?? throw new InvalidOperationException();
 
             return llmResponse;
         }

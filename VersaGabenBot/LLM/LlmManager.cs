@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VersaGabenBot.Data.Models;
+using VersaGabenBot.Data.Repositories;
 using VersaGabenBot.Options;
 
 namespace VersaGabenBot.LLM
@@ -22,10 +23,16 @@ namespace VersaGabenBot.LLM
             _client = client;
         }
 
-        public async Task<string> ProcessMessageAsync(SocketSelfUser currentUser, SocketUserMessage message, Guild guild)
+        public async Task<string> ProcessMessageAsync(SocketUserMessage message, Guild guild, ChannelRepository channelRepository, bool botMentioned)
         {
             if (string.IsNullOrEmpty(message.CleanContent)) // TODO: process attachments.
                 return null;
+
+            bool botRandomReply = new Random().NextDouble() <= guild.LlmOptions.RandomReplyChance;
+            if (!botMentioned && !botRandomReply)
+                return null;
+
+            using IDisposable typing = message.Channel.EnterTypingState();
 
             string formatted;
             if (_options.IncludeMessageSender)
@@ -34,29 +41,15 @@ namespace VersaGabenBot.LLM
                     .Replace(_options.MessagePlaceholder, message.CleanContent);
             else
                 formatted = message.Content;
-            Message llmMessage = new Message(Roles.User, formatted);
+            LlmMessage llmMessage = new LlmMessage(Roles.User, formatted);
 
-            // Store messages in history that not even addressed to bot.
-            if (!guild.Options.LlmOptions.OnlySaveChatHistoryRelatedToBot)
-                guild.AppendMessage(message.Channel.Id, llmMessage);
-
-            bool isRandomReply = new Random().NextDouble() <= guild.Options.LlmOptions.RandomReplyChance;
-            bool isMentioned = message.MentionedUsers.Any(user => user.Id == currentUser.Id);
-
-            if (!isMentioned && !isRandomReply)
-                return null;
-
-            using IDisposable typing = message.Channel.EnterTypingState();
-
-            if (guild.Options.LlmOptions.OnlySaveChatHistoryRelatedToBot)
-                guild.AppendMessage(message.Channel.Id, llmMessage);
-
-            var messages = guild.MessageHistoryPerChannel[message.Channel.Id].TakeLast(guild.Options.LlmOptions.MessagesContextSize);
-            Message response = await _client.GenerateTextAsync(messages);
+            // TODO: replace ChannelRepository with smth like IHistoryReader?
+            var messages = await channelRepository.GetMessages(message.Channel.Id, guild.LlmOptions.MessagesContextSize);
+            var llmMessages = messages.Select(m => new LlmMessage(m)); // TODO: probably extremely inefficient.
+            LlmMessage response = await _client.GenerateTextAsync(llmMessages);
 
             if (_options.RemoveEmptyLines)
                 response.RemoveConsecutiveEmptyLines(_options.MaxEmptyLines);
-            guild.AppendMessage(message.Channel.Id, response);
 
             return response.Content;
         }

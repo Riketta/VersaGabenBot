@@ -6,10 +6,11 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using VersaGabenBot.Data.Models;
 
 namespace VersaGabenBot.LLM
 {
-    internal class Message
+    internal class LlmMessage
     {
         [JsonPropertyName("role")]
         public Roles Role { get; private set; }
@@ -21,18 +22,18 @@ namespace VersaGabenBot.LLM
         public List<byte[]> Images { get; private set; }
 
         [JsonConstructor]
-        public Message(Roles role, string content, List<byte[]> images = null)
+        public LlmMessage(Roles role, string content, List<byte[]> images = null)
         {
             Role = role;
             Content = content;
             Images = images;
         }
 
-        public Message(Roles role, SocketUserMessage message)
+        public LlmMessage(Message message)
         {
-            Role = role;
+            Role = message.AuthorRole;
             Content = message.Content;
-            Images = null; // TODO: process attachments.
+            Images = null; // TODO: handle images.
         }
 
         public void RemoveConsecutiveEmptyLines(int maxEmptyLines = 1)

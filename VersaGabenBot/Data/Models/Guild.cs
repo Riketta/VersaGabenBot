@@ -11,64 +11,10 @@ namespace VersaGabenBot.Data.Models
 {
     internal class Guild
     {
-        [JsonInclude]
-        public ulong ID { get; private set; }
-
-        [JsonInclude]
-        public GuildOptions Options { get; private set; } = new GuildOptions();
-
-        [JsonInclude]
-        public List<string> AssociatedBotNames { get; private set; }
-
-        [JsonInclude]
-        public ulong BotChannelID { get; set; }
-
-        [JsonInclude]
-        private HashSet<ulong> ChannelIDs { get; set; } = new HashSet<ulong>();
-
-        [JsonInclude]
-        public ConcurrentDictionary<ulong, ConcurrentQueue<Message>> MessageHistoryPerChannel { get; private set; } = new();
-
-        [JsonConstructor]
-        public Guild() { }
-
-        public Guild(ulong id)
-        {
-            ID = id;
-        }
-
-        public void AppendMessage(ulong channel, Message message)
-        {
-            if (!MessageHistoryPerChannel.ContainsKey(channel))
-                MessageHistoryPerChannel[channel] = new ConcurrentQueue<Message>();
-
-            MessageHistoryPerChannel[channel].Enqueue(message);
-
-            if (MessageHistoryPerChannel[channel].Count > Options.MessageHistoryLimitPerChannel)
-                MessageHistoryPerChannel[channel].TryDequeue(out Message _);
-        }
-
-        public void ClearChannelHistory(ulong channel)
-        {
-            if (!MessageHistoryPerChannel.ContainsKey(channel))
-                return;
-
-            MessageHistoryPerChannel[channel].Clear();
-        }
-
-        public void RegisterChannel(ulong channel) 
-        {
-            ChannelIDs.Add(channel);
-        }
-
-        public void UnregisterChannel(ulong channel)
-        {
-            ChannelIDs.Remove(channel);
-        }
-
-        public bool IsChannelRegistered(ulong uuid)
-        {
-            return ChannelIDs.Any(channel => channel == uuid);
-        }
+        public ulong GuildID { get; set; }
+        public ulong? SystemChannelID { get; set; }
+        public GuildOptions Options { get; set; }
+        public GuildLlmOptions LlmOptions { get; set; }
+        public ICollection<Channel> Channels { get; set; }
     }
 }

@@ -8,8 +8,8 @@ namespace VersaGabenBot.LLM
 {
     internal interface ILlmClient
     {
-        public Task<Message> GenerateTextAsync(string message);
-        public Task<Message> GenerateTextAsync(Message message);
-        public Task<Message> GenerateTextAsync(IEnumerable<Message> messages);
+        public Task<LlmMessage> GenerateTextAsync(string message);
+        public Task<LlmMessage> GenerateTextAsync(LlmMessage message);
+        public Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages);
     }
 }

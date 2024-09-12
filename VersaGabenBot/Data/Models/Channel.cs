@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Data.Models
 {
-    internal class GuildOptions
+    internal class Channel
     {
+        public ulong ChannelID { get; set; }
         public ulong GuildID { get; set; }
-        public uint MessageHistoryLimitPerChannel { get; set; } = 300;
+        //public Guild Guild { get; set; }
+        public ICollection<Message> Messages { get; set; }
     }
 }

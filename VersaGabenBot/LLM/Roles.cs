@@ -10,8 +10,8 @@ namespace VersaGabenBot.LLM
     [JsonConverter(typeof(JsonStringEnumConverter<Roles>))]
     internal enum Roles
     {
-        System,
-        User,
-        Assistant
+        System = 0,
+        User = 1,
+        Assistant = 2,
     }
 }

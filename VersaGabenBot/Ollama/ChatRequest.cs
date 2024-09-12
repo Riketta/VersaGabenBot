@@ -14,7 +14,7 @@ namespace VersaGabenBot.Ollama
         public string Model { get; set; }
 
         [JsonPropertyName("messages")]
-        public List<Message> Messages { get; set; }
+        public List<LlmMessage> Messages { get; set; }
 
         [JsonPropertyName("options")]
         public ModelfileOptions ModelfileOptions { get; set; }

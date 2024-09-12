@@ -33,14 +33,16 @@ namespace VersaGabenBot
         private readonly DiscordSocketClient _client;
         private readonly CommandHandler _commandHandler;
 
-        private readonly BotConfig _config;
-        private readonly Database _db;
-        private readonly LlmManager _llmManager;
         private readonly GuildRepository _guildRepository;
+        private readonly ChannelRepository _channelRepository;
+
+        private readonly BotConfig _config;
+        private readonly DatabaseContext _db;
+        private readonly LlmManager _llmManager;
 
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config, Database db, LlmManager llmManager, GuildRepository guildRepository)
+        public Bot(BotConfig config, DatabaseContext db, LlmManager llmManager, GuildRepository guildRepository, ChannelRepository channelRepository)
         {
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
@@ -50,14 +52,16 @@ namespace VersaGabenBot
             });
             List<ICommand> commands = new List<ICommand>()
             {
-                new StatusCommand(guildRepository),
+                new StatusCommand(guildRepository, channelRepository),
             };
             _commandHandler = new CommandHandler(_client, commands);
 
             _config = config;
             _db = db;
             _llmManager = llmManager;
+
             _guildRepository = guildRepository;
+            _channelRepository = channelRepository;
         }
 
         // Keep the CommandService and DI container around for use with commands.
@@ -97,42 +101,46 @@ namespace VersaGabenBot
 
         private async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
         {
-            Guild guild = _guildRepository.GetGuildByChannelUUID(channel.Id);
+            Guild guild = await _guildRepository.GetGuildByChannelID(channel.Id);
             if (guild is null) return;
 
             string message = string.Format("[InviteDeleted] \"{0}\" for \"{1}\"", code, channel?.Name ?? "-");
             logger.Info(message);
-            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            if (guild.SystemChannelID is not null)
+                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private async Task Client_InviteCreated(SocketInvite invite)
         {
-            Guild guild = _guildRepository.GetGuildByChannelUUID(invite.Guild.Id);
+            Guild guild = await _guildRepository.GetGuildByChannelID(invite.Guild.Id);
             if (guild is null) return;
 
             string message = string.Format("[InviteCreated] \"{0}\" (\"{1}\"): \"{2}\" for \"{3}\"", invite.Inviter.Username, invite.Inviter.Nickname ?? "-", invite.Code, invite.TargetUser?.Username ?? "-");
             logger.Info(message);
-            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            if (guild.SystemChannelID is not null)
+                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private async Task Client_UserLeft(SocketGuild socketGuild, SocketUser user)
         {
-            Guild guild = _guildRepository.GetGuildByChannelUUID(socketGuild.Id);
+            Guild guild = await _guildRepository.GetGuildByChannelID(socketGuild.Id);
             if (guild is null) return;
 
             string message = string.Format("[UserLeft] \"{0}\"", user.Username);
             logger.Info(message);
-            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            if (guild.SystemChannelID is not null)
+                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            Guild guild = _guildRepository.GetGuildByChannelUUID(user.Guild.Id);
+            Guild guild = await _guildRepository.GetGuildByChannelID(user.Guild.Id);
             if (guild is null) return;
 
             string message = string.Format("[UserJoined] \"{0}\"", user.Username);
             logger.Info(message);
-            await (_client.GetChannel(guild.BotChannelID) as ISocketMessageChannel).SendMessageAsync(message);
+            if (guild.SystemChannelID is not null)
+                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private void StatusTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -148,38 +156,48 @@ namespace VersaGabenBot
             return status;
         }
 
-        private async Task Client_MessageReceived(SocketMessage msg)
+        private async Task Client_MessageReceived(SocketMessage socketMessage)
         {
-            if (msg is not SocketUserMessage message) return;
-            if (message.Author.Id == _client.CurrentUser.Id || message.Author.IsBot) return;
+            if (socketMessage is not SocketUserMessage userMessage) return;
+            if (userMessage.Author.Id == _client.CurrentUser.Id || userMessage.Author.IsBot) return;
 
             // If the guild is not found, the message channel is not registered and should not be processed further.
             // An exception is a request to register a channel from a person with such rights.
-            Guild guild = _guildRepository.GetGuildByChannelUUID(message.Channel.Id);
+            Guild guild = await _guildRepository.GetGuildByChannelID(userMessage.Channel.Id);
             if (guild is null) return;
 
+            bool botMentioned = userMessage.MentionedUsers.Any(user => user.Id == _client.CurrentUser.Id);
+            Message message = new Message(userMessage, Roles.User, botMentioned);
+            await _channelRepository.InsertMessage(message);
+
             // TODO: implement as a slash commands.
-            if (message.Content.StartsWith("!wipe"))
+            if (userMessage.Content.StartsWith("!wipe"))
             {
-                guild.ClearChannelHistory(message.Channel.Id);
+                await _channelRepository.DeleteAllMessages(userMessage.Channel.Id);
                 return;
             }
-            else if (message.Content.StartsWith("!save"))
+            else if (userMessage.Content.StartsWith("!save"))
             {
-                await _db.SaveDatabase();
+                await _db.Save();
                 return;
             }
 
-            async Task blockingTask() // This task should not be awaited.
+            async Task blockingLlmTask() // This task should not be awaited.
             {
-                string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser, message, guild);
+                string response = await _llmManager.ProcessMessageAsync(userMessage, guild, _channelRepository, botMentioned);
                 string[] messages = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);
 
-                if (messages is not null && messages.Length > 0)
-                    foreach (var msg in messages)
-                        await message.ReplyAsync(msg);
+                if (messages is null || messages.Length == 0)
+                    return;
+
+                foreach (var llmResponseContent in messages)
+                {
+                    var llmResponse = await userMessage.ReplyAsync(llmResponseContent);
+                    var llmMessage = new Message(llmResponse, Roles.Assistant, true);
+                    await _channelRepository.InsertMessage(message); // TODO: store messages and insert as a batch at once.
+                }
             }
-            _ = Task.Run(blockingTask);
+            _ = Task.Run(blockingLlmTask);
         }
 
         private Task Log(LogMessage message)
