@@ -43,7 +43,10 @@ namespace VersaGabenBot.Commands
         public async Task Handle(SocketSlashCommand command) // TODO: validate authorization.
         {
             if (command.User.Id != _adminID)
+            {
+                await command.RespondAsync(embed: TemplateEmbedBuilder.ErrorUnauthorizedCommandUse().Build(), ephemeral: true);
                 return;
+            }
 
             ulong guildId = command.GuildId.Value;
             if (!await _guildRepository.IsGuildRegistered(guildId))

@@ -40,15 +40,24 @@ namespace VersaGabenBot.Commands
         public async Task Handle(SocketSlashCommand command)
         {
             if (command.User.Id != _adminID)
+            {
+                await command.RespondAsync(embed: TemplateEmbedBuilder.ErrorUnauthorizedCommandUse().Build(), ephemeral: true);
                 return;
+            }
 
             ulong guildId = command.GuildId.Value;
             if (!await _guildRepository.IsGuildRegistered(guildId))
+            {
+                await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Guild not registered!").Build(), ephemeral: true);
                 return;
+            }
 
             ulong channelId = command.ChannelId.Value;
             if (!await _channelRepository.IsChannelRegistered(channelId))
+            {
+                await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Channel not registered!").Build(), ephemeral: true);
                 return;
+            }
 
             await _channelRepository.UnregisterChannel(channelId);
 
