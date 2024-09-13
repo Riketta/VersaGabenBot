@@ -143,9 +143,9 @@ namespace VersaGabenBot.Data.Repositories
                 LIMIT @{nameof(count)}";
 
             using var connection = await _db.GetConnection();
-            var messages = (await connection.QueryAsync<Message>(sql, new { ChannelId = channelId, count })).ToList();
+            var messages = await connection.QueryAsync<Message>(sql, new { channelId, count });
 
-            return messages;
+            return messages.ToList();
         }
 
         public async Task<uint> GetMessagesCount(ulong channelId)
