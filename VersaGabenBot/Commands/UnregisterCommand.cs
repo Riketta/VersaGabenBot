@@ -52,6 +52,8 @@ namespace VersaGabenBot.Commands
 
             await _channelRepository.UnregisterChannel(channelId);
 
+            // TODO: handle guild unregistration?
+
             var embed = new EmbedBuilder()
                 .WithTitle("Channel unregistration")
                 .WithDescription($"Channel ({channelId}) successfully unregistered.")
