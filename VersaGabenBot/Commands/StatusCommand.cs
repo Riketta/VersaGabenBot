@@ -40,25 +40,30 @@ namespace VersaGabenBot.Commands
 
         public async Task Handle(SocketSlashCommand command)
         {
-            ulong channelId = command.ChannelId.Value;
-            if (!await _guildRepository.IsGuildRegistered(channelId))
+            ulong guildId = command.GuildId.Value;
+            Guild guild = await _guildRepository.GetGuild(guildId);
+            if (guild is null)
             {
                 await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Guild not registered!").Build(), ephemeral: true);
                 return;
             }
 
+            ulong channelId = command.ChannelId.Value;
             if (!await _channelRepository.IsChannelRegistered(channelId))
             {
                 await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Channel not registered!").Build(), ephemeral: true);
                 return;
+            }
 
-            var messagesCount = await _channelRepository.GetMessagesCount(channelId);
-            var maxLlmMessagesCount = (await _guildRepository.GetGuildLlmOptions(channelId)).MessagesContextSize;
+            uint currentMessagesCount = await _channelRepository.GetMessagesCount(channelId);
+            uint maxMessagesCount = guild.Options.MessageHistoryLimitPerChannel;
+            uint currentLlmMessagesCount = Math.Min(currentMessagesCount, guild.LlmOptions.MessagesContextSize);
+            uint maxLlmMessagesCount = guild.LlmOptions.MessagesContextSize;
 
             string[] reports =
             [
-                $"Current history length: {messagesCount}.",
-                $"LLM history length: {Math.Min(messagesCount, maxLlmMessagesCount)}.",
+                $"Current history length: {currentMessagesCount}/{maxMessagesCount}.",
+                $"LLM history length: {currentLlmMessagesCount}/{maxLlmMessagesCount}.",
             ];
 
             var embed = new EmbedBuilder()
