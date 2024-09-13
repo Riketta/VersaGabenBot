@@ -66,6 +66,7 @@ namespace VersaGabenBot
                 new SaveCommand(),
                 new WipeCommand(),
                 new ClearCommand(),
+                new PushMessageCommand(),
             };
             _commandHandler = new CommandHandler(_client, commands);
         }
