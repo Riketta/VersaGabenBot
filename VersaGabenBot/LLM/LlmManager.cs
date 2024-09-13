@@ -23,29 +23,18 @@ namespace VersaGabenBot.LLM
             _client = client;
         }
 
-        public async Task<string> ProcessMessageAsync(SocketUserMessage message, Guild guild, ChannelRepository channelRepository, bool botMentioned)
+        public async Task<string> ProcessMessageAsync(ulong selfId, IEnumerable<Message> messages)
         {
-            if (string.IsNullOrEmpty(message.CleanContent)) // TODO: process attachments.
-                return null;
+            // TODO: process attachments.
 
-            bool botRandomReply = new Random().NextDouble() <= guild.LlmOptions.RandomReplyChance;
-            if (!botMentioned && !botRandomReply)
-                return null;
-
-            using IDisposable typing = message.Channel.EnterTypingState();
-
-            string formatted;
-            if (_options.IncludeMessageSender)
-                formatted = _options.MessageWithSenderTemplate
-                    .Replace(_options.SenderPlaceholder, message.Author.GlobalName ?? message.Author.Username)
-                    .Replace(_options.MessagePlaceholder, message.CleanContent);
-            else
-                formatted = message.Content;
-            LlmMessage llmMessage = new LlmMessage(Roles.User, formatted);
-
-            // TODO: replace ChannelRepository with smth like IHistoryReader?
-            var messages = await channelRepository.GetMessages(message.Channel.Id, guild.LlmOptions.MessagesContextSize);
-            var llmMessages = messages.Select(m => new LlmMessage(m)); // TODO: probably extremely inefficient.
+            // TODO: probably extremely inefficient.
+            var llmMessages = messages.Select(m =>
+            {
+                if (_options.IncludeMessageSender && m.UserID != selfId)
+                    return new LlmMessage(m, _options.MessageWithSenderTemplate, _options.SenderPlaceholder, _options.MessagePlaceholder);
+                else
+                    return new LlmMessage(m);
+            });
             LlmMessage response = await _client.GenerateTextAsync(llmMessages);
 
             if (_options.RemoveEmptyLines)

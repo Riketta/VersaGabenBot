@@ -198,13 +198,25 @@ namespace VersaGabenBot
 
             async Task blockingLlmTask() // This task should not be awaited.
             {
-                string response = await _llmManager.ProcessMessageAsync(userMessage, guild, _channelRepository, botMentioned);
-                string[] messages = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);
-
-                if (messages is null || messages.Length == 0)
+                if (string.IsNullOrEmpty(message.Content))
                     return;
 
-                foreach (var llmResponseContent in messages)
+                bool botRandomReply = new Random().NextDouble() <= guild.LlmOptions.RandomReplyChance;
+                if (!botMentioned && !botRandomReply)
+                    return;
+
+                using IDisposable typing = userMessage.Channel.EnterTypingState();
+
+                // TODO: replace ChannelRepository with smth like IHistoryReader?
+                List<Message> messages = await _channelRepository.GetMessages(message.ChannelID, guild.LlmOptions.MessagesContextSize);
+
+                string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser.Id, messages);
+                string[] llmResponses = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);
+
+                if (llmResponses is null || llmResponses.Length == 0)
+                    return;
+
+                foreach (var llmResponseContent in llmResponses)
                 {
                     var llmResponse = await userMessage.ReplyAsync(llmResponseContent);
                     var llmMessage = new Message(llmResponse, Roles.Assistant, true);

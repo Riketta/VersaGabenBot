@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using VersaGabenBot.Data.Models;
+using VersaGabenBot.Options;
 
 namespace VersaGabenBot.LLM
 {
@@ -19,7 +21,7 @@ namespace VersaGabenBot.LLM
         public string Content { get; private set; }
 
         [JsonPropertyName("images")]
-        public List<byte[]> Images { get; private set; }
+        public List<byte[]> Images { get; private set; } // TODO: handle images.
 
         [JsonConstructor]
         public LlmMessage(Roles role, string content, List<byte[]> images = null)
@@ -31,9 +33,16 @@ namespace VersaGabenBot.LLM
 
         public LlmMessage(Message message)
         {
-            Role = message.AuthorRole;
+            Role = message.LlmRole;
             Content = message.Content;
-            Images = null; // TODO: handle images.
+        }
+
+        public LlmMessage(Message message, string template, string senderPlaceholder, string messagePlaceholder)
+        {
+            Role = message.LlmRole;
+            Content = template
+                .Replace(senderPlaceholder, message.Username)
+                .Replace(messagePlaceholder, message.Content);
         }
 
         public void RemoveConsecutiveEmptyLines(int maxEmptyLines = 1)
