@@ -80,7 +80,8 @@ namespace VersaGabenBot.Data.Repositories
 
                     return guild;
                 },
-                new { guildId }
+                new { guildId },
+                splitOn: nameof(Guild.GuildID)
             )).SingleOrDefault();
 
             return guild;
@@ -88,35 +89,19 @@ namespace VersaGabenBot.Data.Repositories
 
         public async Task<Guild> GetGuildWithChannels(ulong guildId)
         {
-            var sql =
-                @$"SELECT
-                    G.*,
-                    GO.*,
-                    GLO.*
-                FROM
-                    {nameof(Guild)}s AS G
-                LEFT JOIN
-                    {nameof(GuildOptions)} AS GO ON G.{nameof(Guild.GuildID)} = GO.{nameof(GuildOptions.GuildID)}
-                LEFT JOIN
-                    {nameof(GuildLlmOptions)} AS GLO ON G.{nameof(Guild.GuildID)} = GLO.{nameof(GuildLlmOptions.GuildID)}
-                WHERE
-                    G.{nameof(Guild.GuildID)} = @{nameof(guildId)};
+            var guild = await GetGuild(guildId); // TODO: rewrite as single query.
+            if (guild is null)
+                return null;
 
-                SELECT * FROM {nameof(Channel)}s
+            var sql =
+                @$"SELECT * FROM {nameof(Channel)}s
                 WHERE {nameof(Channel.GuildID)} = @{nameof(guildId)};";
 
             using var connection = await _db.GetConnection();
-            var mapper = await connection.QueryMultipleAsync(sql, new { guildId });
+            var channels = await connection.QueryAsync<Channel>(sql, new { guildId });
+            guild.Channels = channels.ToList();
 
-            var guildWithChannels = await mapper.ReadSingleOrDefaultAsync<Guild>();
-
-            if (guildWithChannels is null)
-                return null;
-
-            var guildChannels = await mapper.ReadAsync<Channel>();
-            guildWithChannels.Channels = guildChannels.ToList();
-
-            return guildWithChannels;
+            return guild;
         }
 
         public async Task<Guild> GetGuildWithChannelsByChannelID(ulong channelId)
