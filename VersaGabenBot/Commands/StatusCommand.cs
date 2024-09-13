@@ -41,7 +41,15 @@ namespace VersaGabenBot.Commands
         public async Task Handle(SocketSlashCommand command)
         {
             ulong channelId = command.ChannelId.Value;
-            if (!await _guildRepository.IsGuildRegistered(channelId)) // TODO: print error message?
+            if (!await _guildRepository.IsGuildRegistered(channelId))
+            {
+                await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Guild not registered!").Build(), ephemeral: true);
+                return;
+            }
+
+            if (!await _channelRepository.IsChannelRegistered(channelId))
+            {
+                await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Channel not registered!").Build(), ephemeral: true);
                 return;
 
             var messagesCount = await _channelRepository.GetMessagesCount(channelId);
