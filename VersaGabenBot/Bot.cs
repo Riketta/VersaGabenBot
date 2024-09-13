@@ -53,8 +53,8 @@ namespace VersaGabenBot
             List<ICommand> commands = new List<ICommand>()
             {
                 new StatusCommand(guildRepository, channelRepository),
-                new RegisterCommand(guildRepository, channelRepository),
-                new UnregisterCommand(guildRepository, channelRepository),
+                new RegisterCommand(guildRepository, channelRepository, _config.DebugUserID),
+                new UnregisterCommand(guildRepository, channelRepository, _config.DebugUserID),
                 new SaveCommand(),
                 new WipeCommand(),
                 new ClearCommand(),
