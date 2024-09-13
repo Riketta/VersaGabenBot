@@ -107,7 +107,7 @@ namespace VersaGabenBot
 
         private async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
         {
-            Guild guild = await _guildRepository.GetGuildByChannelID(channel.Id);
+            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(channel.Id);
             if (guild is null) return;
 
             string message = string.Format("[InviteDeleted] \"{0}\" for \"{1}\"", code, channel?.Name ?? "-");
@@ -118,7 +118,7 @@ namespace VersaGabenBot
 
         private async Task Client_InviteCreated(SocketInvite invite)
         {
-            Guild guild = await _guildRepository.GetGuildByChannelID(invite.Guild.Id);
+            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(invite.Guild.Id);
             if (guild is null) return;
 
             string message = string.Format("[InviteCreated] \"{0}\" (\"{1}\"): \"{2}\" for \"{3}\"", invite.Inviter.Username, invite.Inviter.Nickname ?? "-", invite.Code, invite.TargetUser?.Username ?? "-");
@@ -129,7 +129,7 @@ namespace VersaGabenBot
 
         private async Task Client_UserLeft(SocketGuild socketGuild, SocketUser user)
         {
-            Guild guild = await _guildRepository.GetGuildByChannelID(socketGuild.Id);
+            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(socketGuild.Id);
             if (guild is null) return;
 
             string message = string.Format("[UserLeft] \"{0}\"", user.Username);
@@ -140,7 +140,7 @@ namespace VersaGabenBot
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            Guild guild = await _guildRepository.GetGuildByChannelID(user.Guild.Id);
+            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(user.Guild.Id);
             if (guild is null) return;
 
             string message = string.Format("[UserJoined] \"{0}\"", user.Username);
@@ -169,7 +169,7 @@ namespace VersaGabenBot
 
             // If the guild is not found, the message channel is not registered and should not be processed further.
             // An exception is a request to register a channel from a person with such rights.
-            Guild guild = await _guildRepository.GetGuildByChannelID(userMessage.Channel.Id);
+            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(userMessage.Channel.Id);
             if (guild is null) return;
 
             bool botMentioned = userMessage.MentionedUsers.Any(user => user.Id == _client.CurrentUser.Id);

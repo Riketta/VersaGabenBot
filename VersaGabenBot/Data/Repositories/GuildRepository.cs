@@ -119,18 +119,22 @@ namespace VersaGabenBot.Data.Repositories
             return guildWithChannels;
         }
 
-        public async Task<Guild> GetGuildByChannelID(ulong channelId)
+        public async Task<Guild> GetGuildWithChannelsByChannelID(ulong channelId)
         {
             var sql =
-                @$"SELECT *
-                FROM {nameof(Guild)}s g
-                INNER JOIN {nameof(Channel)}s c ON g.{nameof(Guild.GuildID)} = c.{nameof(Channel.GuildID)}
-                WHERE c.{nameof(Guild.GuildID)} = @{nameof(channelId)};";
+                @$"SELECT {nameof(Guild.GuildID)}
+                FROM {nameof(Guild)}s
+                WHERE {nameof(Guild.GuildID)} = (
+                    SELECT {nameof(Channel.GuildID)}
+                    FROM {nameof(Channel)}s
+                    WHERE {nameof(Channel.ChannelID)} = @{nameof(channelId)});";
 
             using var connection = await _db.GetConnection();
-            var guild = await connection.QuerySingleOrDefaultAsync<Guild>(sql, new { channelId });
+            var guildId = await connection.ExecuteScalarAsync<ulong>(sql, new { channelId });
+            var guildWithChannels = await GetGuildWithChannels(guildId); // TODO: rewrite as single query.
+            // TODO: Guild should include only current channel?
 
-            return guild;
+            return guildWithChannels;
         }
 
         public async Task<bool> IsGuildRegistered(ulong guildId)
