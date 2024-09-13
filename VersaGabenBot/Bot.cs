@@ -208,7 +208,7 @@ namespace VersaGabenBot
                 {
                     var llmResponse = await userMessage.ReplyAsync(llmResponseContent);
                     var llmMessage = new Message(llmResponse, Roles.Assistant, true);
-                    await _channelRepository.InsertMessage(message); // TODO: store messages and insert as a batch at once.
+                    await _channelRepository.InsertMessage(llmMessage); // TODO: store messages and insert as a batch at once.
                 }
             }
             _ = Task.Run(blockingLlmTask);
