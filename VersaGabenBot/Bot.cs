@@ -50,6 +50,14 @@ namespace VersaGabenBot
                 MessageCacheSize = 50,
                 GatewayIntents = GatewayIntents.All,
             });
+
+            _config = config;
+            _db = db;
+            _llmManager = llmManager;
+
+            _guildRepository = guildRepository;
+            _channelRepository = channelRepository;
+
             List<ICommand> commands = new List<ICommand>()
             {
                 new StatusCommand(guildRepository, channelRepository),
@@ -60,13 +68,6 @@ namespace VersaGabenBot
                 new ClearCommand(),
             };
             _commandHandler = new CommandHandler(_client, commands);
-
-            _config = config;
-            _db = db;
-            _llmManager = llmManager;
-
-            _guildRepository = guildRepository;
-            _channelRepository = channelRepository;
         }
 
         // Keep the CommandService and DI container around for use with commands.
