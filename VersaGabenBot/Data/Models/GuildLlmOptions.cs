@@ -14,6 +14,8 @@ namespace VersaGabenBot.Data.Models
         public bool OnlyProcessChatHistoryRelatedToBot { get; set; } = false;
         public double RandomReplyChance { get; set; } = 0.025f;
 
+        private GuildLlmOptions() { }
+
         public GuildLlmOptions(ulong guildId)
         {
             GuildID = guildId;

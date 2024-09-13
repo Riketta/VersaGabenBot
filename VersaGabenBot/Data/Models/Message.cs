@@ -20,6 +20,8 @@ namespace VersaGabenBot.Data.Models
         public bool BotRelated { get; set; }
         public string Content { get; set; }
 
+        private Message() { }
+
         public Message(IUserMessage message, Roles role, bool botRelated)
         {
             MessageID = message.Id;
