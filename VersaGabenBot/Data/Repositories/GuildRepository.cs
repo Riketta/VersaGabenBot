@@ -24,8 +24,8 @@ namespace VersaGabenBot.Data.Repositories
             Guild guild = new Guild()
             {
                 GuildID = guildId,
-                Options = new GuildOptions(),
-                LlmOptions = new GuildLlmOptions(),
+                Options = new GuildOptions(guildId),
+                LlmOptions = new GuildLlmOptions(guildId),
             };
 
             var sql =

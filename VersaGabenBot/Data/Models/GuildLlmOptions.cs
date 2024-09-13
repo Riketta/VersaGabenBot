@@ -13,5 +13,10 @@ namespace VersaGabenBot.Data.Models
         public uint MessagesContextSize { get; set; } = 100;
         public bool OnlyProcessChatHistoryRelatedToBot { get; set; } = false;
         public double RandomReplyChance { get; set; } = 0.025f;
+
+        public GuildLlmOptions(ulong guildId)
+        {
+            GuildID = guildId;
+        }
     }
 }

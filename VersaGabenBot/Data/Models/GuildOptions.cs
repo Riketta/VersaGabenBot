@@ -12,5 +12,10 @@ namespace VersaGabenBot.Data.Models
     {
         public ulong GuildID { get; set; }
         public uint MessageHistoryLimitPerChannel { get; set; } = 300;
+
+        public GuildOptions(ulong guildId)
+        {
+            GuildID = guildId;
+        }
     }
 }
