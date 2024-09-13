@@ -27,14 +27,15 @@ namespace VersaGabenBot.Data.Repositories
                     {nameof(Channel.GuildID)}
                 ) VALUES (
                     @{nameof(channelId)},
-                    @{nameof(Channel.GuildID)}
+                    @{nameof(guildId)}
                 );";
 
             using var connection = await _db.GetConnection();
             await connection.ExecuteAsync(sql,
                 new
                 {
-                    channelId
+                    channelId,
+                    guildId,
                 }).ConfigureAwait(false);
 
             return new Channel() { ChannelID = guildId, GuildID = guildId };
