@@ -56,6 +56,7 @@ namespace VersaGabenBot
                 new RegisterCommand(guildRepository, channelRepository),
                 new UnregisterCommand(guildRepository, channelRepository),
                 new SaveCommand(),
+                new WipeCommand(),
             };
             _commandHandler = new CommandHandler(_client, commands);
 

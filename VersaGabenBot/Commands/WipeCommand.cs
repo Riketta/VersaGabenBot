@@ -11,18 +11,21 @@ namespace VersaGabenBot.Commands
 {
     internal class WipeCommand : IGlobalCommand
     {
-        public RestGlobalCommand RestGlobalCommand { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        public string Name => throw new NotImplementedException();
-
-        public RestApplicationCommand RestApplicationCommand => throw new NotImplementedException();
-
-        public Task Handle(SocketSlashCommand command)
-        {
-            throw new NotImplementedException();
-        }
+        public string Name => "wipe";
+        public RestGlobalCommand RestGlobalCommand { get; set; }
+        public RestApplicationCommand RestApplicationCommand => RestGlobalCommand;
 
         public SlashCommandProperties Prepare()
+        {
+            var command = new SlashCommandBuilder()
+                .WithName(Name)
+                .WithDescription("Wipe current channel chat history. Prefere to use \"/clear\" instead.")
+                .Build();
+
+            return command;
+        }
+
+        public Task Handle(SocketSlashCommand command)
         {
             throw new NotImplementedException();
         }
