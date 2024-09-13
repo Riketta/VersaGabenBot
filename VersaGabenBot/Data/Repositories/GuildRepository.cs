@@ -21,6 +21,13 @@ namespace VersaGabenBot.Data.Repositories
         #region Guild
         public async Task<Guild> RegisterGuild(ulong guildId)
         {
+            Guild guild = new Guild()
+            {
+                GuildID = guildId,
+                Options = new GuildOptions(),
+                LlmOptions = new GuildLlmOptions(),
+            };
+
             var sql =
                 @$"INSERT INTO {nameof(Guild)}s ({nameof(Guild.GuildID)})
                 VALUES (@{nameof(guildId)});";
@@ -28,9 +35,11 @@ namespace VersaGabenBot.Data.Repositories
             using var connection = await _db.GetConnection();
             await connection.ExecuteAsync(sql, new { guildId }).ConfigureAwait(false);
 
-            // TODO: add according options.
+            // TODO: rewrite as singl request.
+            await InsertGuildOptions(guild.Options);
+            await InsertGuildLlmOptions(guild.LlmOptions);
 
-            return new Guild() { GuildID = guildId };
+            return guild;
         }
 
         public async Task UnregisterGuild(ulong guildId)
