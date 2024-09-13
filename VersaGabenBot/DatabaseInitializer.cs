@@ -48,7 +48,7 @@ namespace VersaGabenBot
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(Channel)}s (
                     {nameof(Channel.ChannelID)} BIGINT PRIMARY KEY,
-                    {nameof(Channel.GuildID)} BIGINT REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)})
+                    {nameof(Channel.GuildID)} BIGINT REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}) ON DELETE CASCADE
                );";
 
             await connection.ExecuteAsync(sql);
@@ -59,7 +59,7 @@ namespace VersaGabenBot
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(Message)}s (
                     {nameof(Message.MessageID)} BIGINT PRIMARY KEY,
-                    {nameof(Message.ChannelID)} BIGINT REFERENCES {nameof(Channel)}s({nameof(Channel.ChannelID)}),
+                    {nameof(Message.ChannelID)} BIGINT REFERENCES {nameof(Channel)}s({nameof(Channel.ChannelID)}) ON DELETE CASCADE,
                     {nameof(Message.UserID)} BIGINT NOT NULL,
                     {nameof(Message.Timestamp)} DATETIME NOT NULL,
                     {nameof(Message.AuthorRole)} INT NOT NULL,
@@ -86,7 +86,7 @@ namespace VersaGabenBot
         {
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(GuildOptions)} (
-                    {nameof(GuildOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}),
+                    {nameof(GuildOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}) ON DELETE CASCADE,
                     {nameof(GuildOptions.MessageHistoryLimitPerChannel)} INT NOT NULL DEFAULT 300
                );";
 
@@ -97,7 +97,7 @@ namespace VersaGabenBot
         {
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(GuildLlmOptions)} (
-                    {nameof(GuildLlmOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}),
+                    {nameof(GuildLlmOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}) ON DELETE CASCADE,
                     {nameof(GuildLlmOptions.MessagesContextSize)} INT NOT NULL,
                     {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)} INT NOT NULL,
                     {nameof(GuildLlmOptions.RandomReplyChance)} DOUBLE NOT NULL
