@@ -25,8 +25,8 @@ namespace VersaGabenBot
             using var connection = await _context.GetConnection();
 
             CreateGuildsTable(connection);
-            CreateMessagesTable(connection);
             CreateChannelsTable(connection);
+            CreateMessagesTable(connection);
             CreateUsersTable(connection);
             CreateGuildOptionsTable(connection);
             CreateGuildLlmOptionsTable(connection);
@@ -43,6 +43,17 @@ namespace VersaGabenBot
             await connection.ExecuteAsync(sql);
         }
 
+        private async void CreateChannelsTable(IDbConnection connection)
+        {
+            string sql =
+                @$"CREATE TABLE IF NOT EXISTS {nameof(Channel)}s (
+                    {nameof(Channel.ChannelID)} BIGINT PRIMARY KEY,
+                    {nameof(Channel.GuildID)} BIGINT REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)})
+               );";
+
+            await connection.ExecuteAsync(sql);
+        }
+
         private async void CreateMessagesTable(IDbConnection connection)
         {
             string sql =
@@ -54,17 +65,6 @@ namespace VersaGabenBot
                     {nameof(Message.AuthorRole)} INT NOT NULL,
                     {nameof(Message.BotRelated)} Boolean NOT NULL,
                     {nameof(Message.Content)} TEXT NOT NULL
-               );";
-
-            await connection.ExecuteAsync(sql);
-        }
-
-        private async void CreateChannelsTable(IDbConnection connection)
-        {
-            string sql =
-                @$"CREATE TABLE IF NOT EXISTS {nameof(Channel)}s (
-                    {nameof(Channel.ChannelID)} BIGINT PRIMARY KEY,
-                    {nameof(Channel.GuildID)} BIGINT REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)})
                );";
 
             await connection.ExecuteAsync(sql);
