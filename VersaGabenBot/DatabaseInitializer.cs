@@ -86,7 +86,7 @@ namespace VersaGabenBot
         {
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(GuildOptions)} (
-                    {nameof(GuildOptions.GuildID)} REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}),
+                    {nameof(GuildOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}),
                     {nameof(GuildOptions.MessageHistoryLimitPerChannel)} INT NOT NULL DEFAULT 300
                );";
 
@@ -97,7 +97,7 @@ namespace VersaGabenBot
         {
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(GuildLlmOptions)} (
-                    {nameof(GuildLlmOptions.GuildID)} REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}),
+                    {nameof(GuildLlmOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}),
                     {nameof(GuildLlmOptions.MessagesContextSize)} INT NOT NULL,
                     {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)} INT NOT NULL,
                     {nameof(GuildLlmOptions.RandomReplyChance)} DOUBLE NOT NULL
