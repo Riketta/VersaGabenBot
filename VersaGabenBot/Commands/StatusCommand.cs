@@ -41,7 +41,7 @@ namespace VersaGabenBot.Commands
         public async Task Handle(SocketSlashCommand command)
         {
             ulong channelId = command.ChannelId.Value;
-            if (!await _guildRepository.IsGuildRegistered(channelId))
+            if (!await _guildRepository.IsGuildRegistered(channelId)) // TODO: print error message?
                 return;
 
             var messagesCount = await _channelRepository.GetMessagesCount(channelId);
