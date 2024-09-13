@@ -152,10 +152,10 @@ namespace VersaGabenBot.Data.Repositories
             var sql =
                 @$"INSERT INTO {nameof(GuildOptions)} (
                     {nameof(GuildOptions.GuildID)},
-                    {nameof(GuildOptions.MessageHistoryLimitPerChannel)},
+                    {nameof(GuildOptions.MessageHistoryLimitPerChannel)}
                 ) VALUES (
                     @{nameof(options.GuildID)},
-                    @{nameof(options.MessageHistoryLimitPerChannel)},
+                    @{nameof(options.MessageHistoryLimitPerChannel)}
                 );";
 
             using var connection = await _db.GetConnection();
@@ -179,7 +179,7 @@ namespace VersaGabenBot.Data.Repositories
             var sql =
                 @$"UPDATE {nameof(GuildOptions)}
                 SET
-                {nameof(GuildOptions.MessageHistoryLimitPerChannel)} = @{nameof(options.MessageHistoryLimitPerChannel)},
+                {nameof(GuildOptions.MessageHistoryLimitPerChannel)} = @{nameof(options.MessageHistoryLimitPerChannel)}
                 WHERE {nameof(GuildOptions.GuildID)} = @{nameof(options.GuildID)};";
 
             using var connection = await _db.GetConnection();
@@ -205,12 +205,12 @@ namespace VersaGabenBot.Data.Repositories
                     {nameof(GuildLlmOptions.GuildID)},
                     {nameof(GuildLlmOptions.MessagesContextSize)},
                     {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
-                    {nameof(GuildLlmOptions.RandomReplyChance)},
+                    {nameof(GuildLlmOptions.RandomReplyChance)}
                 ) VALUES (
                     @{nameof(options.GuildID)},
                     @{nameof(GuildLlmOptions.MessagesContextSize)},
                     @{nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
-                    @{nameof(GuildLlmOptions.RandomReplyChance)},
+                    @{nameof(GuildLlmOptions.RandomReplyChance)}
                 );";
 
             using var connection = await _db.GetConnection();
@@ -243,7 +243,7 @@ namespace VersaGabenBot.Data.Repositories
                 SET
                 {nameof(GuildLlmOptions.MessagesContextSize)} = @{nameof(options.MessagesContextSize)},
                 {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)} = @{nameof(options.OnlyProcessChatHistoryRelatedToBot)},
-                {nameof(GuildLlmOptions.RandomReplyChance)} = @{nameof(options.RandomReplyChance)},
+                {nameof(GuildLlmOptions.RandomReplyChance)} = @{nameof(options.RandomReplyChance)}
                 WHERE {nameof(GuildLlmOptions.GuildID)} = @{nameof(options.GuildID)};";
 
             using var connection = await _db.GetConnection();

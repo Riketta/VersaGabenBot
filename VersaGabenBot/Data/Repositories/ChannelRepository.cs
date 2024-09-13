@@ -107,14 +107,14 @@ namespace VersaGabenBot.Data.Repositories
                     {nameof(Message.UserID)},
                     {nameof(Message.Timestamp)},
                     {nameof(Message.AuthorRole)},
-                    {nameof(Message.Content)},
+                    {nameof(Message.Content)}
                 ) VALUES (
                     @{nameof(Message.MessageID)},
                     @{nameof(Message.ChannelID)},
                     @{nameof(Message.UserID)},
                     @{nameof(Message.Timestamp)},
                     @{nameof(Message.AuthorRole)},
-                    @{nameof(Message.Content)},
+                    @{nameof(Message.Content)}
                 );";
 
             using var connection = await _db.GetConnection();
