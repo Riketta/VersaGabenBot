@@ -139,7 +139,7 @@ namespace VersaGabenBot.Data.Repositories
             var sql =
                 @$"SELECT * FROM {nameof(Message)}s
                 WHERE {nameof(Message.ChannelID)} = @{nameof(channelId)}
-                ORDER BY {nameof(Message.Timestamp)} DESC
+                ORDER BY {nameof(Message.Timestamp)} ASC
                 LIMIT @{nameof(count)}";
 
             using var connection = await _db.GetConnection();
