@@ -61,8 +61,9 @@ namespace VersaGabenBot
                     {nameof(Message.MessageID)} BIGINT PRIMARY KEY,
                     {nameof(Message.ChannelID)} BIGINT REFERENCES {nameof(Channel)}s({nameof(Channel.ChannelID)}) ON DELETE CASCADE,
                     {nameof(Message.UserID)} BIGINT NOT NULL,
+                    {nameof(Message.Username)} VARCHAR(255) NOT NULL,
                     {nameof(Message.Timestamp)} DATETIME NOT NULL,
-                    {nameof(Message.AuthorRole)} INT NOT NULL,
+                    {nameof(Message.LlmRole)} INT NOT NULL,
                     {nameof(Message.BotRelated)} Boolean NOT NULL,
                     {nameof(Message.Content)} TEXT NOT NULL
                );";

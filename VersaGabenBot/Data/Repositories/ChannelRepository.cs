@@ -107,7 +107,8 @@ namespace VersaGabenBot.Data.Repositories
                     {nameof(Message.ChannelID)},
                     {nameof(Message.UserID)},
                     {nameof(Message.Timestamp)},
-                    {nameof(Message.AuthorRole)},
+                    {nameof(Message.Username)},
+                    {nameof(Message.LlmRole)},
                     {nameof(Message.BotRelated)},
                     {nameof(Message.Content)}
                 ) VALUES (
@@ -115,7 +116,8 @@ namespace VersaGabenBot.Data.Repositories
                     @{nameof(Message.ChannelID)},
                     @{nameof(Message.UserID)},
                     @{nameof(Message.Timestamp)},
-                    @{nameof(Message.AuthorRole)},
+                    @{nameof(Message.Username)},
+                    @{nameof(Message.LlmRole)},
                     @{nameof(Message.BotRelated)},
                     @{nameof(Message.Content)}
                 );";
@@ -128,7 +130,8 @@ namespace VersaGabenBot.Data.Repositories
                     message.ChannelID,
                     message.UserID,
                     message.Timestamp,
-                    message.AuthorRole,
+                    message.Username,
+                    message.LlmRole,
                     message.BotRelated,
                     message.Content,
                 });

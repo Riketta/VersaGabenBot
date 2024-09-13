@@ -15,23 +15,25 @@ namespace VersaGabenBot.Data.Models
         public ulong ChannelID { get; set; }
         //public Channel Channel { get; set; }
         public ulong UserID { get; set; }
+        public string Username { get; set; } // TODO: temp, use Users table.
         public DateTime Timestamp { get; set; }
-        public Roles AuthorRole { get; set; }
+        public Roles LlmRole { get; set; }
         public bool BotRelated { get; set; }
         public string Content { get; set; }
 
         private Message() { }
 
-        public Message(IUserMessage message, Roles role, bool botRelated)
+        public Message(IUserMessage message, Roles llmRole, bool botRelated)
         {
             MessageID = message.Id;
             ChannelID = message.Channel.Id;
             UserID = message.Author.Id;
+            Username = message.Author.GlobalName ?? message.Author.Username;
             Timestamp = message.Timestamp.DateTime;
             BotRelated = botRelated;
             Content = message.CleanContent;
 
-            AuthorRole = role;
+            LlmRole = llmRole;
         }
     }
 }
