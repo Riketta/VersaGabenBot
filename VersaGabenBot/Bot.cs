@@ -205,7 +205,7 @@ namespace VersaGabenBot
                 using IDisposable typing = userMessage.Channel.EnterTypingState();
 
                 // TODO: replace ChannelRepository with smth like IHistoryReader?
-                List<Message> messages = await _channelRepository.GetMessages(message.ChannelID, guild.LlmOptions.MessagesContextSize);
+                List<Message> messages = await _channelRepository.GetMessagesWithCutoff(message.ChannelID, guild.LlmOptions.MessagesContextSize);
 
                 string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser.Id, messages);
                 string[] llmResponses = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);

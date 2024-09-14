@@ -60,7 +60,7 @@ namespace VersaGabenBot.Commands
             uint currentLlmMessagesCount = Math.Min(currentMessagesCount, guild.LlmOptions.MessagesContextSize);
             uint maxLlmMessagesCount = guild.LlmOptions.MessagesContextSize;
 
-            List<Message> messages = await _channelRepository.GetMessages(channelId, guild.LlmOptions.MessagesContextSize);
+            List<Message> messages = await _channelRepository.GetMessagesWithCutoff(channelId, guild.LlmOptions.MessagesContextSize);
             Message firstMessage = messages.First();
             Message lastMessage = messages.Last();
             string firstMessageReference = "MISSING";
