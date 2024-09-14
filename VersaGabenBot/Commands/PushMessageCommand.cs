@@ -88,7 +88,7 @@ namespace VersaGabenBot.Commands
             await _channelRepository.InsertMessage(message);
 
             string report =
-                $"Message from user \"{message.Username}\" with LLM role {llmRole} pushed to history with content:{Environment.NewLine}```{message.Content}```.";
+                $"Message from user \"{message.Username}\" with LLM role **{llmRole}** pushed to history with following content:{Environment.NewLine}```{message.Content}```";
 
             var embed = new EmbedBuilder()
                 .WithTitle("Message pushed to channel history")
