@@ -80,7 +80,7 @@ namespace VersaGabenBot.Commands
                 ChannelID = channelId,
                 UserID = user.Id,
                 Username = user.GetGlobalNameOrUsername(),
-                Timestamp = DateTime.Now, // TODO: UTC?
+                Timestamp = DateTime.UtcNow,
                 LlmRole = llmRole,
                 BotRelated = true,
                 Content = content,
