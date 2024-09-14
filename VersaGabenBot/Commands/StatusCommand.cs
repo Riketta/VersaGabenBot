@@ -48,7 +48,8 @@ namespace VersaGabenBot.Commands
             }
 
             ulong channelId = command.ChannelId.Value;
-            if (!await _channelRepository.IsChannelRegistered(channelId))
+            Channel channel = await _channelRepository.GetChannel(channelId);
+            if (channel is null)
             {
                 await command.RespondAsync(embed: TemplateEmbedBuilder.ErrorChannelNotRegistered().Build(), ephemeral: true);
                 return;
@@ -77,6 +78,7 @@ namespace VersaGabenBot.Commands
 
             string[] reports =
             [
+                $"Current cutoff: {channel.MessagesCutoff}.",
                 $"Current history length: {currentMessagesCount}/{maxMessagesCount}.",
                 $"LLM history length: {currentLlmMessagesCount}/{maxLlmMessagesCount}.",
                 Environment.NewLine,
