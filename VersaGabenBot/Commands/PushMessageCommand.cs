@@ -76,7 +76,7 @@ namespace VersaGabenBot.Commands
 
             Message message = new Message()
             {
-                MessageID = 0, // TODO: dangerous?
+                MessageID = command.Id, // Something unique for every call, so it should be decent.
                 ChannelID = channelId,
                 UserID = user.Id,
                 Username = user.GetGlobalNameOrUsername(),
