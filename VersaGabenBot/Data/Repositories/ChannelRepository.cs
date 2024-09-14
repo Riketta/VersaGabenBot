@@ -140,10 +140,13 @@ namespace VersaGabenBot.Data.Repositories
         public async Task<List<Message>> GetMessages(ulong channelId, uint count)
         {
             var sql =
-                @$"SELECT * FROM {nameof(Message)}s
-                WHERE {nameof(Message.ChannelID)} = @{nameof(channelId)}
-                ORDER BY {nameof(Message.Timestamp)} ASC
-                LIMIT @{nameof(count)}";
+                @$"SELECT * FROM (
+                    SELECT * FROM {nameof(Message)}s
+                    WHERE {nameof(Message.ChannelID)} = @{nameof(channelId)}
+                    ORDER BY {nameof(Message.Timestamp)} DESC
+                    LIMIT @{nameof(count)}
+                    )
+                ORDER BY Timestamp ASC;";
 
             using var connection = await _db.GetConnection();
             var messages = await connection.QueryAsync<Message>(sql, new { channelId, count });
