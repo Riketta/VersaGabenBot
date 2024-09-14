@@ -60,10 +60,23 @@ namespace VersaGabenBot.Commands
             uint currentLlmMessagesCount = Math.Min(currentMessagesCount, guild.LlmOptions.MessagesContextSize);
             uint maxLlmMessagesCount = guild.LlmOptions.MessagesContextSize;
 
+            List<Message> messages = await _channelRepository.GetMessages(channelId, guild.LlmOptions.MessagesContextSize);
+            Message firstMessage = messages.First();
+            Message lastMessage = messages.Last();
+            string firstMessageReference = "GENERATED";
+            string lastMessageReference = firstMessageReference;
+            if (firstMessage.MessageID > 0)
+                firstMessageReference = (await command.Channel.GetMessageAsync(firstMessage.MessageID)).GetJumpUrl();
+            if (lastMessage.MessageID > 0)
+                lastMessageReference = (await command.Channel.GetMessageAsync(lastMessage.MessageID)).GetJumpUrl();
+
             string[] reports =
             [
                 $"Current history length: {currentMessagesCount}/{maxMessagesCount}.",
                 $"LLM history length: {currentLlmMessagesCount}/{maxLlmMessagesCount}.",
+                Environment.NewLine,
+                $"First LLM message ({firstMessage.Timestamp} - {firstMessageReference}): ```{firstMessage.Content}```",
+                $"Last LLM message ({lastMessage.Timestamp} - {lastMessageReference}): ```{lastMessage.Content}```",
             ];
 
             var embed = new EmbedBuilder()
