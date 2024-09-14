@@ -25,5 +25,15 @@ namespace VersaGabenBot
         {
             return Error("Unauthorized use of command!");
         }
+
+        public static EmbedBuilder ErrorGuildNotRegistered()
+        {
+            return Error("Guild not registered!");
+        }
+
+        public static EmbedBuilder ErrorChannelNotRegistered()
+        {
+            return Error("Channel not registered!");
+        }
     }
 }
