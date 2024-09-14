@@ -108,7 +108,7 @@ namespace VersaGabenBot
 
         private async Task Client_InviteDeleted(SocketGuildChannel channel, string code)
         {
-            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(channel.Id);
+            Guild guild = await _guildRepository.GetGuild(channel.Id);
             if (guild is null)
                 return;
 
@@ -120,7 +120,7 @@ namespace VersaGabenBot
 
         private async Task Client_InviteCreated(SocketInvite invite)
         {
-            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(invite.Guild.Id);
+            Guild guild = await _guildRepository.GetGuild(invite.Guild.Id);
             if (guild is null)
                 return;
 
@@ -132,7 +132,7 @@ namespace VersaGabenBot
 
         private async Task Client_UserLeft(SocketGuild socketGuild, SocketUser user)
         {
-            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(socketGuild.Id);
+            Guild guild = await _guildRepository.GetGuild(socketGuild.Id);
             if (guild is null)
                 return;
 
@@ -144,7 +144,7 @@ namespace VersaGabenBot
 
         private async Task Client_UserJoined(SocketGuildUser user)
         {
-            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(user.Guild.Id);
+            Guild guild = await _guildRepository.GetGuild(user.Guild.Id);
             if (guild is null)
                 return;
 
