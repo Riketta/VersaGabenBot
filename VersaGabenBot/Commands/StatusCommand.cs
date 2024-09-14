@@ -17,7 +17,6 @@ namespace VersaGabenBot.Commands
     {
         private readonly GuildRepository _guildRepository;
         private readonly ChannelRepository _channelRepository;
-
         public string Name => "status";
         public RestGlobalCommand RestGlobalCommand { get; set; }
         public RestApplicationCommand RestApplicationCommand => RestGlobalCommand;
