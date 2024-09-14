@@ -44,14 +44,14 @@ namespace VersaGabenBot.Commands
             Guild guild = await _guildRepository.GetGuild(guildId);
             if (guild is null)
             {
-                await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Guild not registered!").Build(), ephemeral: true);
+                await command.RespondAsync(embed: TemplateEmbedBuilder.ErrorGuildNotRegistered().Build(), ephemeral: true);
                 return;
             }
 
             ulong channelId = command.ChannelId.Value;
             if (!await _channelRepository.IsChannelRegistered(channelId))
             {
-                await command.RespondAsync(embed: TemplateEmbedBuilder.Error("Channel not registered!").Build(), ephemeral: true);
+                await command.RespondAsync(embed: TemplateEmbedBuilder.ErrorChannelNotRegistered().Build(), ephemeral: true);
                 return;
             }
 
