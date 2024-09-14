@@ -154,6 +154,26 @@ namespace VersaGabenBot.Data.Repositories
             return messages.ToList();
         }
 
+        public async Task<List<Message>> GetMessagesWithCutoff(ulong channelId, uint count)
+        {
+            var sql =
+                @$"SELECT * FROM (
+	                SELECT * FROM {nameof(Message)}s as M
+	                LEFT JOIN (
+		                SELECT {nameof(Channel.MessagesCutoff)} FROM {nameof(Channel)}s WHERE {nameof(Channel.ChannelID)} = @{nameof(channelId)}
+	                ) AS C
+	                WHERE M.{nameof(Message.ChannelID)} = @{nameof(channelId)} AND M.{nameof(Message.Timestamp)} > C.{nameof(Channel.MessagesCutoff)}
+	                ORDER BY M.{nameof(Message.Timestamp)} DESC
+	                LIMIT @{nameof(count)}
+	                )
+                ORDER BY Timestamp ASC;";
+
+            using var connection = await _db.GetConnection();
+            var messages = await connection.QueryAsync<Message>(sql, new { channelId, count });
+
+            return messages.ToList();
+        }
+
         public async Task<uint> GetMessagesCount(ulong channelId)
         {
             var sql =

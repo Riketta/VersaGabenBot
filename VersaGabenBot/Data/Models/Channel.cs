@@ -11,6 +11,7 @@ namespace VersaGabenBot.Data.Models
         public ulong ChannelID { get; set; }
         public ulong GuildID { get; set; }
         //public Guild Guild { get; set; }
+        public DateTime MessagesCutoff { get; set; } = DateTime.MinValue;
         public ICollection<Message> Messages { get; set; }
     }
 }

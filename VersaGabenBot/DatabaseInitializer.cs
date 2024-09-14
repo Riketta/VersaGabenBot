@@ -48,7 +48,8 @@ namespace VersaGabenBot
             string sql =
                 @$"CREATE TABLE IF NOT EXISTS {nameof(Channel)}s (
                     {nameof(Channel.ChannelID)} BIGINT PRIMARY KEY,
-                    {nameof(Channel.GuildID)} BIGINT REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}) ON DELETE CASCADE
+                    {nameof(Channel.GuildID)} BIGINT REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}) ON DELETE CASCADE,
+                    {nameof(Channel.MessagesCutoff)} DATETIME NOT NULL
                );";
 
             await connection.ExecuteAsync(sql);
