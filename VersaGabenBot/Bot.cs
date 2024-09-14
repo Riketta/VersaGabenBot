@@ -65,7 +65,7 @@ namespace VersaGabenBot
                 new UnregisterCommand(guildRepository, channelRepository, _config.DebugUserID),
                 new SaveCommand(),
                 new WipeCommand(),
-                new ClearCommand(),
+                new ResetCutoffCommand(channelRepository),
                 new PushMessageCommand(guildRepository, channelRepository),
             };
             _commandHandler = new CommandHandler(_client, commands);
