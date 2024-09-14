@@ -28,7 +28,7 @@ namespace VersaGabenBot.Data.Models
             MessageID = message.Id;
             ChannelID = message.Channel.Id;
             UserID = message.Author.Id;
-            Username = message.Author.GlobalName ?? message.Author.Username;
+            Username = message.Author.GetGlobalNameOrUsername();
             Timestamp = message.Timestamp.DateTime;
             BotRelated = botRelated;
             Content = message.CleanContent;
