@@ -114,8 +114,7 @@ namespace VersaGabenBot
 
             string message = string.Format("[InviteDeleted] \"{0}\" for \"{1}\"", code, channel?.Name ?? "-");
             logger.Info(message);
-            if (guild.SystemChannelID is not null)
-                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
+            await TrySendMessageToSystemChannel(guild.SystemChannelID, message);
         }
 
         private async Task Client_InviteCreated(SocketInvite invite)
@@ -126,8 +125,7 @@ namespace VersaGabenBot
 
             string message = string.Format("[InviteCreated] \"{0}\" (\"{1}\"): \"{2}\" for \"{3}\"", invite.Inviter.Username, invite.Inviter.Nickname ?? "-", invite.Code, invite.TargetUser?.Username ?? "-");
             logger.Info(message);
-            if (guild.SystemChannelID is not null)
-                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
+            await TrySendMessageToSystemChannel(guild.SystemChannelID, message);
         }
 
         private async Task Client_UserLeft(SocketGuild socketGuild, SocketUser user)
@@ -138,8 +136,7 @@ namespace VersaGabenBot
 
             string message = string.Format("[UserLeft] \"{0}\"", user.Username);
             logger.Info(message);
-            if (guild.SystemChannelID is not null)
-                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
+            await TrySendMessageToSystemChannel(guild.SystemChannelID, message);
         }
 
         private async Task Client_UserJoined(SocketGuildUser user)
@@ -150,8 +147,7 @@ namespace VersaGabenBot
 
             string message = string.Format("[UserJoined] \"{0}\"", user.Username);
             logger.Info(message);
-            if (guild.SystemChannelID is not null)
-                await (_client.GetChannel(guild.SystemChannelID.Value) as ISocketMessageChannel).SendMessageAsync(message);
+            await TrySendMessageToSystemChannel(guild.SystemChannelID, message);
         }
 
         private void StatusTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -225,6 +221,12 @@ namespace VersaGabenBot
                 }
             }
             _ = Task.Run(blockingLlmTask);
+        }
+
+        private async Task TrySendMessageToSystemChannel(ulong? systemChannelId, string message)
+        {
+            if (systemChannelId is not null && systemChannelId != 0)
+                await (_client.GetChannel(systemChannelId.Value) as ISocketMessageChannel).SendMessageAsync(message);
         }
 
         private Task Log(LogMessage message)
