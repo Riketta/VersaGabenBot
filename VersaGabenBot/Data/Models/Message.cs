@@ -21,7 +21,7 @@ namespace VersaGabenBot.Data.Models
         public bool BotRelated { get; set; }
         public string Content { get; set; }
 
-        private Message() { }
+        public Message() { }
 
         public Message(IUserMessage message, Roles llmRole, bool botRelated)
         {
