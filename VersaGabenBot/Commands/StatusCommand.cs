@@ -55,14 +55,14 @@ namespace VersaGabenBot.Commands
                 return;
             }
 
+            List<Message> messages = await _channelRepository.GetMessagesWithCutoff(channelId, guild.LlmOptions.MessagesContextSize);
             uint currentMessagesCount = await _channelRepository.GetMessagesCount(channelId);
             uint maxMessagesCount = guild.Options.MessageHistoryLimitPerChannel;
-            uint currentLlmMessagesCount = Math.Min(currentMessagesCount, guild.LlmOptions.MessagesContextSize);
+            uint currentLlmMessagesCount = Math.Min((uint)messages.Count, guild.LlmOptions.MessagesContextSize);
             uint maxLlmMessagesCount = guild.LlmOptions.MessagesContextSize;
 
-            List<Message> messages = await _channelRepository.GetMessagesWithCutoff(channelId, guild.LlmOptions.MessagesContextSize);
-            Message firstMessage = messages.First();
-            Message lastMessage = messages.Last();
+            Message firstMessage = messages.FirstOrDefault();
+            Message lastMessage = messages.LastOrDefault();
             string firstMessageReference = "MISSING";
             string lastMessageReference = firstMessageReference;
             try
@@ -82,8 +82,8 @@ namespace VersaGabenBot.Commands
                 $"Current history length: {currentMessagesCount}/{maxMessagesCount}.",
                 $"LLM history length: {currentLlmMessagesCount}/{maxLlmMessagesCount}.",
                 Environment.NewLine,
-                $"First LLM message ({firstMessage.Timestamp} - {firstMessageReference}): ```{firstMessage.Content}```",
-                $"Last LLM message ({lastMessage.Timestamp} - {lastMessageReference}): ```{lastMessage.Content}```",
+                $"First LLM message ({firstMessage?.Timestamp ?? DateTime.MinValue} - {firstMessageReference}): ```{firstMessage?.Content ?? "-"}```",
+                $"Last LLM message ({lastMessage?.Timestamp ?? DateTime.MinValue} - {lastMessageReference}): ```{lastMessage?.Content ?? "-"}```",
             ];
 
             var embed = new EmbedBuilder()
