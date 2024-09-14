@@ -42,6 +42,8 @@ namespace VersaGabenBot.Commands
                     .AddChoice(Roles.System.ToString(), (int)Roles.System) // TODO: generate from existing enum?
                     .AddChoice(Roles.User.ToString(), (int)Roles.User)
                     .AddChoice(Roles.Assistant.ToString(), (int)Roles.Assistant)
+                    .WithType(ApplicationCommandOptionType.Integer)
+                    .WithRequired(true)
                 )
                 // TODO: for non-authorized users only let self and bot.
                 .AddOption(OptionNameUser, ApplicationCommandOptionType.User, "The user to fake message from.", isRequired: true)
