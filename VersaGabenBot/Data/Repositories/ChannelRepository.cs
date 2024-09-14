@@ -96,6 +96,19 @@ namespace VersaGabenBot.Data.Repositories
 
             return registered;
         }
+
+        public async Task<bool> UpdateChannelCutoff(ulong channelId, DateTime newCutoff)
+        {
+            var sql =
+                @$"UPDATE {nameof(Channel)}s
+                SET {nameof(Channel.MessagesCutoff)} = @{nameof(newCutoff)}
+                WHERE {nameof(Channel.ChannelID)} = @{nameof(channelId)};";
+
+            using var connection = await _db.GetConnection();
+            bool success = await connection.ExecuteScalarAsync<int>(sql, new { channelId, newCutoff }) == 1;
+
+            return success;
+        }
         #endregion
 
         #region Message
