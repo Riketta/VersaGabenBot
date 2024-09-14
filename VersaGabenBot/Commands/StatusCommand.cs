@@ -63,12 +63,18 @@ namespace VersaGabenBot.Commands
             List<Message> messages = await _channelRepository.GetMessages(channelId, guild.LlmOptions.MessagesContextSize);
             Message firstMessage = messages.First();
             Message lastMessage = messages.Last();
-            string firstMessageReference = "GENERATED";
+            string firstMessageReference = "MISSING";
             string lastMessageReference = firstMessageReference;
-            if (firstMessage.MessageID > 0)
+            try
+            {
                 firstMessageReference = (await command.Channel.GetMessageAsync(firstMessage.MessageID)).GetJumpUrl();
-            if (lastMessage.MessageID > 0)
+            }
+            catch { }
+            try
+            {
                 lastMessageReference = (await command.Channel.GetMessageAsync(lastMessage.MessageID)).GetJumpUrl();
+            }
+            catch { }
 
             string[] reports =
             [
