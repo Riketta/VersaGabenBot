@@ -70,7 +70,7 @@ namespace VersaGabenBot.Commands
                 return;
             }
 
-            Roles llmRole = (Roles)command.Data.Options.Single(o => o.Name == OptionNameRole).Value;
+            Roles llmRole = (Roles)(long)command.Data.Options.Single(o => o.Name == OptionNameRole).Value;
             SocketUser user = (SocketUser)command.Data.Options.Single(o => o.Name == OptionNameUser).Value;
             string content = (string)command.Data.Options.Single(o => o.Name == OptionNameMessage).Value;
 
