@@ -10,7 +10,7 @@ namespace VersaGabenBot.Tests
 {
     internal class HelperMethods
     {
-        public static async Task<IDbConnection> CreateInMemoryDatabase(SqliteConnection conn)
+        public static async Task<IDbConnection> CreateInMemoryDatabase()
         {
             var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync();
