@@ -27,5 +27,11 @@ namespace VersaGabenBot.Tests
 
             return connection;
         }
+
+        public static void RemoveTemporaryDatabase()
+        {
+            if (File.Exists(DbFilename))
+                File.Delete(DbFilename);
+        }
     }
 }
