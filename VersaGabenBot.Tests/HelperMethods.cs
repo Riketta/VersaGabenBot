@@ -10,6 +10,8 @@ namespace VersaGabenBot.Tests
 {
     internal class HelperMethods
     {
+        private readonly static string DbFilename = "Tests.db";
+
         public static async Task<IDbConnection> CreateInMemoryDatabase()
         {
             var connection = new SqliteConnection("Data Source=:memory:");
@@ -20,7 +22,7 @@ namespace VersaGabenBot.Tests
 
         public static async Task<IDbConnection> CreateTemporaryDatabase()
         {
-            var connection = new SqliteConnection("Data Source=Tests.db");
+            var connection = new SqliteConnection($"Data Source={DbFilename}");
             await connection.OpenAsync();
 
             return connection;
