@@ -17,5 +17,13 @@ namespace VersaGabenBot.Tests
 
             return connection;
         }
+
+        public static async Task<IDbConnection> CreateTemporaryDatabase()
+        {
+            var connection = new SqliteConnection("Data Source=Tests.db");
+            await connection.OpenAsync();
+
+            return connection;
+        }
     }
 }
