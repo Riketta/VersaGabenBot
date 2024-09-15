@@ -11,9 +11,9 @@ namespace VersaGabenBot.Data.Repositories
 {
     internal class GuildRepository
     {
-        private readonly DatabaseContext _db;
+        private readonly IDatabaseContext _db;
 
-        public GuildRepository(DatabaseContext database)
+        public GuildRepository(IDatabaseContext database)
         {
             _db = database;
         }

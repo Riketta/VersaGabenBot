@@ -11,9 +11,9 @@ namespace VersaGabenBot.Data.Repositories
 {
     internal class ChannelRepository
     {
-        private readonly DatabaseContext _db;
+        private readonly IDatabaseContext _db;
 
-        public ChannelRepository(DatabaseContext database)
+        public ChannelRepository(IDatabaseContext database)
         {
             _db = database;
         }
