@@ -24,12 +24,12 @@ namespace VersaGabenBot.Tests.Repositories
         }
 
         [TestMethod]
-        public void TestRegisterGuild()
+        public async Task TestRegisterGuild()
         {
             ulong guildId = 1525;
 
-            Guild guild = _guildRepository.RegisterGuild(guildId).Result;
-            Guild sameGuild = _guildRepository.GetGuild(guildId).Result;
+            Guild guild = await _guildRepository.RegisterGuild(guildId);
+            Guild sameGuild = await _guildRepository.GetGuild(guildId);
 
             Assert.AreEqual(guild.GuildID, guildId);
             Assert.AreEqual(guild.GuildID, sameGuild.GuildID);
