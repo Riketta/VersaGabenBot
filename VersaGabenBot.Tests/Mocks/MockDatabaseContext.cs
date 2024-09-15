@@ -32,5 +32,10 @@ namespace VersaGabenBot.Tests.Mocks
         {
             throw new NotImplementedException();
         }
+
+        public void Wipe()
+        {
+            HelperMethods.RemoveTemporaryDatabase();
+        }
     }
 }
