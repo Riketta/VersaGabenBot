@@ -7,7 +7,7 @@ using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Contexts
 {
-    internal class DatabaseContext
+    internal class DatabaseContext : IDatabaseContext
     {
         private readonly DatabaseConfig _config;
 
