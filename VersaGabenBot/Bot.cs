@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Discord;
 using Discord.Commands;
+using Discord.Net.WebSockets;
 using Discord.WebSocket;
 using VersaGabenBot.Commands;
 using VersaGabenBot.Contexts;
@@ -42,14 +44,26 @@ namespace VersaGabenBot
 
         //private readonly IServiceProvider _services = ConfigureServices();
 
-        public Bot(BotConfig config, DatabaseContext db, LlmManager llmManager, GuildRepository guildRepository, ChannelRepository channelRepository)
+        public Bot(BotConfig config, ProxyOptions proxyOptions, DatabaseContext db, LlmManager llmManager, GuildRepository guildRepository, ChannelRepository channelRepository)
         {
-            _client = new DiscordSocketClient(new DiscordSocketConfig
+            DiscordSocketConfig discordSocketConfig = new DiscordSocketConfig
             {
                 LogLevel = LogSeverity.Info,
                 MessageCacheSize = 50,
                 GatewayIntents = GatewayIntents.All,
-            });
+            };
+            if (proxyOptions.WebProxyEnabled)
+            {
+                WebProxy webProxy = new WebProxy(
+                    proxyOptions.Address,
+                    proxyOptions.BypassOnLocal,
+                    proxyOptions.BypassList,
+                    proxyOptions.UseCredentials ? proxyOptions.Credentials : null
+                );
+
+                discordSocketConfig.WebSocketProvider = DefaultWebSocketProvider.Create(webProxy);
+            }
+            _client = new DiscordSocketClient(discordSocketConfig);
 
             _config = config;
             _db = db;

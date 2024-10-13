@@ -37,6 +37,7 @@ namespace VersaGabenBot
         public BotConfig BotConfig { get; set; } = new BotConfig();
         public LlmOptions LlmOptions { get; set; } = new LlmOptions();
         public OllamaOptions OllamaOptions { get; set; } = new OllamaOptions();
+        public ProxyOptions ProxyOptions { get; set; } = new ProxyOptions();
         #endregion
 
         [JsonConstructor]

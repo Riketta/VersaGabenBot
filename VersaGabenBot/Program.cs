@@ -35,7 +35,7 @@ namespace VersaGabenBot
             OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
             LlmManager llmManager = new LlmManager(config.LlmOptions, ollamaClient);
 
-            Bot bot = new Bot(config.BotConfig, dbContext, llmManager, guildRepository, channelRepository);
+            Bot bot = new Bot(config.BotConfig, config.ProxyOptions, dbContext, llmManager, guildRepository, channelRepository);
             await bot.Start();
 
             await Task.Delay(Timeout.Infinite);
