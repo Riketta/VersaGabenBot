@@ -29,7 +29,7 @@ namespace VersaGabenBot
             CreateMessagesTable(connection);
             CreateUsersTable(connection);
             CreateGuildOptionsTable(connection);
-            CreateGuildLlmOptionsTable(connection);
+            CreateChannelLlmOptionsTable(connection);
         }
 
         private async void CreateGuildsTable(IDbConnection connection)
@@ -95,14 +95,14 @@ namespace VersaGabenBot
             await connection.ExecuteAsync(sql);
         }
 
-        private async void CreateGuildLlmOptionsTable(IDbConnection connection)
+        private async void CreateChannelLlmOptionsTable(IDbConnection connection)
         {
             string sql =
-                @$"CREATE TABLE IF NOT EXISTS {nameof(GuildLlmOptions)} (
-                    {nameof(GuildLlmOptions.GuildID)} BIGINT PRIMARY KEY REFERENCES {nameof(Guild)}s({nameof(Guild.GuildID)}) ON DELETE CASCADE,
-                    {nameof(GuildLlmOptions.MessagesContextSize)} INT NOT NULL,
-                    {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)} INT NOT NULL,
-                    {nameof(GuildLlmOptions.RandomReplyChance)} DOUBLE NOT NULL
+                @$"CREATE TABLE IF NOT EXISTS {nameof(ChannelLlmOptions)} (
+                    {nameof(ChannelLlmOptions.ChannelID)} BIGINT PRIMARY KEY REFERENCES {nameof(Channel)}s({nameof(Channel.ChannelID)}) ON DELETE CASCADE,
+                    {nameof(ChannelLlmOptions.MessagesContextSize)} INT NOT NULL,
+                    {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)} INT NOT NULL,
+                    {nameof(ChannelLlmOptions.RandomReplyChance)} DOUBLE NOT NULL
                );";
 
             await connection.ExecuteAsync(sql);

@@ -189,7 +189,7 @@ namespace VersaGabenBot
 
             // If the guild is not found, the message channel is not registered and should not be processed further.
             // An exception is a request to register a channel from a person with such rights.
-            Guild guild = await _guildRepository.GetGuildWithChannelsByChannelID(userMessage.Channel.Id);
+            Guild guild = await _guildRepository.GetGuildByChannelID(userMessage.Channel.Id);
             if (guild is null)
                 return;
 
@@ -214,14 +214,15 @@ namespace VersaGabenBot
                 if (string.IsNullOrEmpty(message.Content))
                     return;
 
-                bool botRandomReply = new Random().NextDouble() <= guild.LlmOptions.RandomReplyChance;
+                Channel channel = await _channelRepository.GetChannel(userMessage.Channel.Id);
+                bool botRandomReply = new Random().NextDouble() <= channel.LlmOptions.RandomReplyChance;
                 if (!botMentioned && !botRandomReply)
                     return;
 
                 using IDisposable typing = userMessage.Channel.EnterTypingState();
 
                 // TODO: replace ChannelRepository with smth like IHistoryReader?
-                List<Message> messages = await _channelRepository.GetMessagesWithCutoff(message.ChannelID, guild.LlmOptions.MessagesContextSize);
+                List<Message> messages = await _channelRepository.GetMessagesWithCutoff(message.ChannelID, channel.LlmOptions.MessagesContextSize);
 
                 string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser.Id, messages);
                 string[] llmResponses = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);

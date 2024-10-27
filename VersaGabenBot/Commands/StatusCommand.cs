@@ -55,11 +55,11 @@ namespace VersaGabenBot.Commands
                 return;
             }
 
-            List<Message> messages = await _channelRepository.GetMessagesWithCutoff(channelId, guild.LlmOptions.MessagesContextSize);
+            List<Message> messages = await _channelRepository.GetMessagesWithCutoff(channelId, channel.LlmOptions.MessagesContextSize);
             uint currentMessagesCount = await _channelRepository.GetMessagesCount(channelId);
             uint maxMessagesCount = guild.Options.MessageHistoryLimitPerChannel;
-            uint currentLlmMessagesCount = Math.Min((uint)messages.Count, guild.LlmOptions.MessagesContextSize);
-            uint maxLlmMessagesCount = guild.LlmOptions.MessagesContextSize;
+            uint currentLlmMessagesCount = Math.Min((uint)messages.Count, channel.LlmOptions.MessagesContextSize);
+            uint maxLlmMessagesCount = channel.LlmOptions.MessagesContextSize;
 
             Message firstMessage = messages.FirstOrDefault();
             Message lastMessage = messages.LastOrDefault();

@@ -7,18 +7,18 @@ using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Data.Models
 {
-    internal class GuildLlmOptions
+    internal class ChannelLlmOptions
     {
-        public ulong GuildID { get; set; }
+        public ulong ChannelID { get; set; }
         public uint MessagesContextSize { get; set; } = 100;
         public bool OnlyProcessChatHistoryRelatedToBot { get; set; } = false;
         public double RandomReplyChance { get; set; } = 0.025f;
 
-        private GuildLlmOptions() { }
+        private ChannelLlmOptions() { }
 
-        public GuildLlmOptions(ulong guildId)
+        public ChannelLlmOptions(ulong channelId)
         {
-            GuildID = guildId;
+            ChannelID = channelId;
         }
     }
 }

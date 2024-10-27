@@ -14,7 +14,5 @@ namespace VersaGabenBot.Data.Models
         public ulong GuildID { get; set; }
         public ulong? SystemChannelID { get; set; }
         public GuildOptions Options { get; set; }
-        public GuildLlmOptions LlmOptions { get; set; }
-        public ICollection<Channel> Channels { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VersaGabenBot.Contexts;
 using VersaGabenBot.Data.Models;
+using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Data.Repositories
 {
@@ -21,13 +22,22 @@ namespace VersaGabenBot.Data.Repositories
         #region Channel
         public async Task<Channel> RegisterChannel(ulong channelId, ulong guildId)
         {
+            Channel channel = new Channel()
+            {
+                ChannelID = channelId,
+                GuildID = guildId,
+                LlmOptions = new ChannelLlmOptions(channelId),
+            };
+
             var sql =
                 @$"INSERT INTO {nameof(Channel)}s (
                     {nameof(Channel.ChannelID)},
-                    {nameof(Channel.GuildID)}
+                    {nameof(Channel.GuildID)},
+                    {nameof(Channel.MessagesCutoff)}
                 ) VALUES (
                     @{nameof(channelId)},
-                    @{nameof(guildId)}
+                    @{nameof(guildId)},
+                    @{nameof(Channel.MessagesCutoff)}
                 );";
 
             using var connection = await _db.GetConnection();
@@ -36,9 +46,12 @@ namespace VersaGabenBot.Data.Repositories
                 {
                     channelId,
                     guildId,
+                    channel.MessagesCutoff,
                 }).ConfigureAwait(false);
 
-            return new Channel() { ChannelID = guildId, GuildID = guildId };
+            await InsertChannelLlmOptions(channel.LlmOptions);
+
+            return channel;
         }
 
         public async Task UnregisterChannel(ulong channelId)
@@ -49,16 +62,35 @@ namespace VersaGabenBot.Data.Repositories
 
             using var connection = await _db.GetConnection();
             await connection.ExecuteAsync(sql, new { channelId });
+
+            // TODO: remove according options.
         }
 
         public async Task<Channel> GetChannel(ulong channelId)
         {
             var sql =
-                @$"SELECT * FROM {nameof(Channel)}s
-                WHERE {nameof(Channel.ChannelID)} = @{nameof(channelId)};";
+                @$"SELECT
+                    C.*,
+                    CLO.*
+                FROM
+                    {nameof(Channel)}s AS C
+                LEFT JOIN
+                    {nameof(ChannelLlmOptions)} AS CLO ON C.{nameof(Channel.ChannelID)} = CLO.{nameof(ChannelLlmOptions.ChannelID)}
+                WHERE
+                    C.{nameof(Channel.ChannelID)} = @{nameof(channelId)};";
 
             using var connection = await _db.GetConnection();
-            var channel = await connection.QuerySingleOrDefaultAsync<Channel>(sql, new { channelId });
+            var channel = (await connection.QueryAsync<Channel, ChannelLlmOptions, Channel>(
+            sql,
+            (channel, llmOptions) =>
+            {
+                channel.LlmOptions = llmOptions;
+
+                return channel;
+            },
+            new { channelId },
+            splitOn: nameof(Channel.ChannelID)
+        )).SingleOrDefault();
 
             return channel;
         }
@@ -220,6 +252,79 @@ namespace VersaGabenBot.Data.Repositories
             var rowsAffected = await connection.ExecuteScalarAsync<uint>(sql, new { channelId });
 
             return rowsAffected;
+        }
+
+        public async Task InsertChannelLlmOptions(ChannelLlmOptions options)
+        {
+            var sql =
+                @$"INSERT INTO {nameof(ChannelLlmOptions)} (
+                    {nameof(ChannelLlmOptions.ChannelID)},
+                    {nameof(ChannelLlmOptions.MessagesContextSize)},
+                    {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
+                    {nameof(ChannelLlmOptions.RandomReplyChance)}
+                ) VALUES (
+                    @{nameof(options.ChannelID)},
+                    @{nameof(ChannelLlmOptions.MessagesContextSize)},
+                    @{nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
+                    @{nameof(ChannelLlmOptions.RandomReplyChance)}
+                );";
+
+            using var connection = await _db.GetConnection();
+            await connection.ExecuteAsync(sql,
+                new
+                {
+                    options.ChannelID,
+                    options.MessagesContextSize,
+                    options.OnlyProcessChatHistoryRelatedToBot,
+                    options.RandomReplyChance,
+                });
+        }
+        #endregion
+
+        #region ChannelLlmOptions
+        public async Task<ChannelLlmOptions> GetChannelLlmOptions(ulong channelId)
+        {
+            var sql =
+                @$"SELECT * FROM {nameof(ChannelLlmOptions)}
+                WHERE {nameof(ChannelLlmOptions.ChannelID)} = @{nameof(channelId)};";
+
+            using var connection = await _db.GetConnection();
+            var options = await connection.QuerySingleOrDefaultAsync<ChannelLlmOptions>(sql, new { channelId });
+
+            return options;
+        }
+
+        public async Task UpdateChannelLlmOptions(ChannelLlmOptions options)
+        {
+            var sql =
+                @$"UPDATE
+                    {nameof(ChannelLlmOptions)}
+                SET
+                    {nameof(ChannelLlmOptions.MessagesContextSize)} = @{nameof(options.MessagesContextSize)},
+                    {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)} = @{nameof(options.OnlyProcessChatHistoryRelatedToBot)},
+                    {nameof(ChannelLlmOptions.RandomReplyChance)} = @{nameof(options.RandomReplyChance)}
+                WHERE
+                    {nameof(ChannelLlmOptions.ChannelID)} = @{nameof(options.ChannelID)};";
+
+            using var connection = await _db.GetConnection();
+            await connection.ExecuteAsync(sql,
+                new
+                {
+                    options.MessagesContextSize,
+                    options.OnlyProcessChatHistoryRelatedToBot,
+                    options.RandomReplyChance,
+                    options.ChannelID
+                });
+        }
+
+        public async Task DeleteChannelLlmOptions(ulong channelId)
+        {
+            var sql =
+                @$"DELETE FROM {nameof(ChannelLlmOptions)}
+                WHERE {nameof(ChannelLlmOptions.ChannelID)} = @{nameof(channelId)}";
+
+            using var connection = await _db.GetConnection();
+            await connection.ExecuteAsync(sql, new { channelId });
         }
         #endregion
     }

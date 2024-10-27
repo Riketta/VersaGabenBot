@@ -25,7 +25,6 @@ namespace VersaGabenBot.Data.Repositories
             {
                 GuildID = guildId,
                 Options = new GuildOptions(guildId),
-                LlmOptions = new GuildLlmOptions(guildId),
             };
 
             var sql =
@@ -35,9 +34,8 @@ namespace VersaGabenBot.Data.Repositories
             using var connection = await _db.GetConnection();
             await connection.ExecuteAsync(sql, new { guildId }).ConfigureAwait(false);
 
-            // TODO: rewrite as singl request.
+            // TODO: rewrite as single request.
             await InsertGuildOptions(guild.Options);
-            await InsertGuildLlmOptions(guild.LlmOptions);
 
             return guild;
         }
@@ -59,24 +57,20 @@ namespace VersaGabenBot.Data.Repositories
             var sql =
                 @$"SELECT
                     G.*,
-                    GO.*,
-                    GLO.*
+                    GO.*
                 FROM
                     {nameof(Guild)}s AS G
                 LEFT JOIN
                     {nameof(GuildOptions)} AS GO ON G.{nameof(Guild.GuildID)} = GO.{nameof(GuildOptions.GuildID)}
-                LEFT JOIN
-                    {nameof(GuildLlmOptions)} AS GLO ON G.{nameof(Guild.GuildID)} = GLO.{nameof(GuildLlmOptions.GuildID)}
                 WHERE
                     G.{nameof(Guild.GuildID)} = @{nameof(guildId)};";
 
             using var connection = await _db.GetConnection();
-            var guild = (await connection.QueryAsync<Guild, GuildOptions, GuildLlmOptions, Guild>(
+            var guild = (await connection.QueryAsync<Guild, GuildOptions, Guild>(
                 sql,
-                (guild, options, llmOptions) =>
+                (guild, options) =>
                 {
                     guild.Options = options;
-                    guild.LlmOptions = llmOptions;
 
                     return guild;
                 },
@@ -87,24 +81,7 @@ namespace VersaGabenBot.Data.Repositories
             return guild;
         }
 
-        public async Task<Guild> GetGuildWithChannels(ulong guildId)
-        {
-            var guild = await GetGuild(guildId); // TODO: rewrite as single query.
-            if (guild is null)
-                return null;
-
-            var sql =
-                @$"SELECT * FROM {nameof(Channel)}s
-                WHERE {nameof(Channel.GuildID)} = @{nameof(guildId)};";
-
-            using var connection = await _db.GetConnection();
-            var channels = await connection.QueryAsync<Channel>(sql, new { guildId });
-            guild.Channels = channels.ToList();
-
-            return guild;
-        }
-
-        public async Task<Guild> GetGuildWithChannelsByChannelID(ulong channelId)
+        public async Task<Guild> GetGuildByChannelID(ulong channelId)
         {
             var sql =
                 @$"SELECT {nameof(Guild.GuildID)}
@@ -116,10 +93,9 @@ namespace VersaGabenBot.Data.Repositories
 
             using var connection = await _db.GetConnection();
             var guildId = await connection.ExecuteScalarAsync<ulong>(sql, new { channelId });
-            var guildWithChannels = await GetGuildWithChannels(guildId); // TODO: rewrite as single query.
-            // TODO: Guild should include only current channel?
+            var guild = await GetGuild(guildId); // TODO: rewrite as single query.
 
-            return guildWithChannels;
+            return guild;
         }
 
         public async Task<bool> IsGuildRegistered(ulong guildId)
@@ -180,77 +156,6 @@ namespace VersaGabenBot.Data.Repositories
             var sql =
                 @$"DELETE FROM {nameof(GuildOptions)}
                 WHERE {nameof(GuildOptions.GuildID)} = @{nameof(guildId)}";
-
-            using var connection = await _db.GetConnection();
-            await connection.ExecuteAsync(sql, new { guildId });
-        }
-        #endregion
-
-        #region GuildLlmOptions
-        public async Task InsertGuildLlmOptions(GuildLlmOptions options)
-        {
-            var sql =
-                @$"INSERT INTO {nameof(GuildLlmOptions)} (
-                    {nameof(GuildLlmOptions.GuildID)},
-                    {nameof(GuildLlmOptions.MessagesContextSize)},
-                    {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
-                    {nameof(GuildLlmOptions.RandomReplyChance)}
-                ) VALUES (
-                    @{nameof(options.GuildID)},
-                    @{nameof(GuildLlmOptions.MessagesContextSize)},
-                    @{nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
-                    @{nameof(GuildLlmOptions.RandomReplyChance)}
-                );";
-
-            using var connection = await _db.GetConnection();
-            await connection.ExecuteAsync(sql,
-                new
-                {
-                    options.GuildID,
-                    options.MessagesContextSize,
-                    options.OnlyProcessChatHistoryRelatedToBot,
-                    options.RandomReplyChance,
-                });
-        }
-
-        public async Task<GuildLlmOptions> GetGuildLlmOptions(ulong guildId)
-        {
-            var sql =
-                @$"SELECT * FROM {nameof(GuildLlmOptions)}
-                WHERE {nameof(GuildLlmOptions.GuildID)} = @{nameof(guildId)};";
-
-            using var connection = await _db.GetConnection();
-            var options = await connection.QuerySingleOrDefaultAsync<GuildLlmOptions>(sql, new { guildId });
-
-            return options;
-        }
-
-        public async Task UpdateGuildLlmOptions(GuildLlmOptions options)
-        {
-            var sql =
-                @$"UPDATE {nameof(GuildLlmOptions)}
-                SET
-                {nameof(GuildLlmOptions.MessagesContextSize)} = @{nameof(options.MessagesContextSize)},
-                {nameof(GuildLlmOptions.OnlyProcessChatHistoryRelatedToBot)} = @{nameof(options.OnlyProcessChatHistoryRelatedToBot)},
-                {nameof(GuildLlmOptions.RandomReplyChance)} = @{nameof(options.RandomReplyChance)}
-                WHERE {nameof(GuildLlmOptions.GuildID)} = @{nameof(options.GuildID)};";
-
-            using var connection = await _db.GetConnection();
-            await connection.ExecuteAsync(sql,
-                new
-                {
-                    options.MessagesContextSize,
-                    options.OnlyProcessChatHistoryRelatedToBot,
-                    options.RandomReplyChance,
-                    options.GuildID
-                });
-        }
-
-        public async Task DeleteGuildLlmOptions(ulong guildId)
-        {
-            var sql =
-                @$"DELETE FROM {nameof(GuildLlmOptions)}
-                WHERE {nameof(GuildLlmOptions.GuildID)} = @{nameof(guildId)}";
 
             using var connection = await _db.GetConnection();
             await connection.ExecuteAsync(sql, new { guildId });
