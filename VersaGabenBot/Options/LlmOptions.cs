@@ -8,6 +8,7 @@ namespace VersaGabenBot.Options
 {
     internal class LlmOptions : IOptions
     {
+        public string DefaultSystemPrompt { get; set; } = "You are a funny public chat bot. Provide very brief, concise responses. You can be toxic.";
         public bool IncludeMessageSender { get; set; } = false;
         public string SenderPlaceholder { get; set; } = "{sender}";
         public string MessagePlaceholder { get; set; } = "{message}";

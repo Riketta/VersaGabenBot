@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Nodes;
 using VersaGabenBot.LLM;
 using System.Linq;
+using VersaGabenBot.Data.Models;
 
 namespace VersaGabenBot.Ollama
 {
@@ -52,10 +53,15 @@ namespace VersaGabenBot.Ollama
 
         public async Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages)
         {
+            return await GenerateTextAsync(messages, null);
+        }
+
+        public async Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages, string systemPrompt)
+        {
             ChatRequest chatRequest = new ChatRequest()
             {
                 Model = _options.Model,
-                Messages = new List<LlmMessage>(_options.SetupMessages),
+                Messages = new List<LlmMessage>(),
                 ModelfileOptions = new ModelfileOptions()
                 {
                     ContextWindow = _options.ContextWindow,
@@ -64,6 +70,9 @@ namespace VersaGabenBot.Ollama
                 Stream = _options.Stream,
                 KeepAlive = _options.KeepAlive,
             };
+
+            if (!string.IsNullOrEmpty(systemPrompt))
+                chatRequest.Messages.Add(new LlmMessage(Roles.System, systemPrompt));
             chatRequest.Messages.AddRange(messages);
 
             string jsonRequest = JsonSerializer.Serialize(chatRequest, serializerOptions);

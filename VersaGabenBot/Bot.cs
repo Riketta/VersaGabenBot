@@ -224,7 +224,7 @@ namespace VersaGabenBot
                 // TODO: replace ChannelRepository with smth like IHistoryReader?
                 List<Message> messages = await _channelRepository.GetMessagesWithCutoff(message.ChannelID, channel.LlmOptions.MessagesContextSize);
 
-                string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser.Id, messages);
+                string response = await _llmManager.ProcessMessageAsync(_client.CurrentUser.Id, messages, channel.LlmOptions);
                 string[] llmResponses = response?.SplitByLengthAtNewLine(_config.MaxMessageLength);
 
                 if (llmResponses is null || llmResponses.Length == 0)

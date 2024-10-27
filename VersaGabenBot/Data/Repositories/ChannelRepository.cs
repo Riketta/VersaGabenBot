@@ -261,12 +261,14 @@ namespace VersaGabenBot.Data.Repositories
                     {nameof(ChannelLlmOptions.ChannelID)},
                     {nameof(ChannelLlmOptions.MessagesContextSize)},
                     {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
-                    {nameof(ChannelLlmOptions.RandomReplyChance)}
+                    {nameof(ChannelLlmOptions.RandomReplyChance)},
+                    {nameof(ChannelLlmOptions.SystemPrompt)}
                 ) VALUES (
                     @{nameof(options.ChannelID)},
                     @{nameof(ChannelLlmOptions.MessagesContextSize)},
                     @{nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
-                    @{nameof(ChannelLlmOptions.RandomReplyChance)}
+                    @{nameof(ChannelLlmOptions.RandomReplyChance)},
+                    @{nameof(ChannelLlmOptions.SystemPrompt)}
                 );";
 
             using var connection = await _db.GetConnection();
@@ -277,6 +279,7 @@ namespace VersaGabenBot.Data.Repositories
                     options.MessagesContextSize,
                     options.OnlyProcessChatHistoryRelatedToBot,
                     options.RandomReplyChance,
+                    options.SystemPrompt,
                 });
         }
         #endregion

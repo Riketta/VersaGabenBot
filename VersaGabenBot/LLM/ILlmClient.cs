@@ -11,5 +11,6 @@ namespace VersaGabenBot.LLM
         public Task<LlmMessage> GenerateTextAsync(string message);
         public Task<LlmMessage> GenerateTextAsync(LlmMessage message);
         public Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages);
+        public Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages, string systemPrompt);
     }
 }

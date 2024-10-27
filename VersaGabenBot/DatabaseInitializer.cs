@@ -102,7 +102,8 @@ namespace VersaGabenBot
                     {nameof(ChannelLlmOptions.ChannelID)} BIGINT PRIMARY KEY REFERENCES {nameof(Channel)}s({nameof(Channel.ChannelID)}) ON DELETE CASCADE,
                     {nameof(ChannelLlmOptions.MessagesContextSize)} INT NOT NULL,
                     {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)} INT NOT NULL,
-                    {nameof(ChannelLlmOptions.RandomReplyChance)} DOUBLE NOT NULL
+                    {nameof(ChannelLlmOptions.RandomReplyChance)} DOUBLE NOT NULL,
+                    {nameof(ChannelLlmOptions.SystemPrompt)} TEXT
                );";
 
             await connection.ExecuteAsync(sql);

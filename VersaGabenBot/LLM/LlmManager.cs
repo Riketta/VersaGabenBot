@@ -23,7 +23,7 @@ namespace VersaGabenBot.LLM
             _client = client;
         }
 
-        public async Task<string> ProcessMessageAsync(ulong selfId, IEnumerable<Message> messages)
+        public async Task<string> ProcessMessageAsync(ulong selfId, IEnumerable<Message> messages, ChannelLlmOptions llmOptions)
         {
             // TODO: process attachments.
 
@@ -35,7 +35,7 @@ namespace VersaGabenBot.LLM
                 else
                     return new LlmMessage(m);
             });
-            LlmMessage response = await _client.GenerateTextAsync(llmMessages);
+            LlmMessage response = await _client.GenerateTextAsync(llmMessages, llmOptions.SystemPrompt ?? _options.DefaultSystemPrompt);
 
             if (_options.RemoveEmptyLines)
                 response.RemoveConsecutiveEmptyLines(_options.MaxEmptyLines);

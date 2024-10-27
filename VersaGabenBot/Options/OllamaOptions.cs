@@ -17,9 +17,5 @@ namespace VersaGabenBot.Options
         public string KeepAlive { get; set; } = "-1m";
         public bool Stream { get; set; } = false;
         public float Temperature { get; set; } = 0.8f;
-        public LlmMessage[] SetupMessages { get; set; } =
-        [
-            new LlmMessage(Roles.System, "You are a funny public chat bot. Provide very brief, concise responses. You can be toxic."),
-        ];
     }
 }
