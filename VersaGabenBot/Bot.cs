@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using Discord;
 using Discord.Commands;
+using Discord.Net.Rest;
 using Discord.Net.WebSockets;
 using Discord.WebSocket;
 using VersaGabenBot.Commands;
@@ -62,6 +63,7 @@ namespace VersaGabenBot
                 );
 
                 discordSocketConfig.WebSocketProvider = DefaultWebSocketProvider.Create(webProxy);
+                discordSocketConfig.RestClientProvider = DefaultRestClientProvider.Create(true, webProxy);
             }
             _client = new DiscordSocketClient(discordSocketConfig);
 
