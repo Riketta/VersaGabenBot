@@ -22,9 +22,9 @@ namespace VersaGabenBot.Ollama
         public int TopK { get; set; } = 40;
 
         [JsonPropertyName("min_p")]
-        public float MinP { get; set; } = 0.95f;
+        public float MinP { get; set; } = 0.05f;
 
         [JsonPropertyName("top_p")]
-        public float MaxP { get; set; } = 0.05f;
+        public float TopP { get; set; } = 0.95f;
     }
 }

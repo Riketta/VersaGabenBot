@@ -8,8 +8,8 @@
         public bool Multimodal { get; set; } = false;
         public uint ContextWindow { get; set; } = 8192;
         public int TopK { get; set; } = 40;
-        public float MinP { get; set; } = 0.95f;
-        public float MaxP { get; set; } = 0.05f;
+        public float MinP { get; set; } = 0.05f;
+        public float TopP { get; set; } = 0.95f;
         public string KeepAlive { get; set; } = "-1m";
         public bool Stream { get; set; } = false;
         public float Temperature { get; set; } = 0.8f;

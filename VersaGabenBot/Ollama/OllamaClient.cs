@@ -64,7 +64,7 @@ namespace VersaGabenBot.Ollama
                     ContextWindow = _options.ContextWindow,
                     Temperature = _options.Temperature,
                     MinP = _options.MinP,
-                    MaxP = _options.MaxP,
+                    TopP = _options.TopP,
                     TopK = _options.TopK,
                 },
                 Stream = _options.Stream,
