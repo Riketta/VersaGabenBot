@@ -103,6 +103,7 @@ namespace VersaGabenBot
                     {nameof(ChannelLlmOptions.MessagesContextSize)} INT NOT NULL,
                     {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)} INT NOT NULL,
                     {nameof(ChannelLlmOptions.RandomReplyChance)} DOUBLE NOT NULL,
+                    {nameof(ChannelLlmOptions.Model)} TEXT NOT NULL,
                     {nameof(ChannelLlmOptions.SystemPrompt)} TEXT
                );";
 

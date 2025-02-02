@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using VersaGabenBot.LLM;
 
 namespace VersaGabenBot.Ollama
@@ -17,7 +13,7 @@ namespace VersaGabenBot.Ollama
         public List<LlmMessage> Messages { get; set; }
 
         [JsonPropertyName("options")]
-        public ModelfileOptions ModelfileOptions { get; set; }
+        public Dictionary<string, object> Parameters { get; set; }
 
         [JsonPropertyName("stream")]
         public bool Stream { get; set; }

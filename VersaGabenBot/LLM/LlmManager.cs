@@ -1,44 +1,42 @@
-﻿using Discord;
-using Discord.WebSocket;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using VersaGabenBot.Data.Models;
-using VersaGabenBot.Data.Repositories;
 using VersaGabenBot.Options;
 
 namespace VersaGabenBot.LLM
 {
     internal class LlmManager
     {
-        private readonly LlmOptions _options;
+        private readonly ModelOptions _modelOptions;
         private readonly ILlmClient _client;
 
-        public LlmManager(LlmOptions options, ILlmClient client)
+        public LlmManager(ModelOptions modelOptions, ILlmClient client)
         {
-            _options = options;
+            _modelOptions = modelOptions;
             _client = client;
         }
 
         public async Task<string> ProcessMessageAsync(ulong selfId, IEnumerable<Message> messages, ChannelLlmOptions llmOptions)
         {
+            Model model = _modelOptions.Models.FirstOrDefault(m => m.Name == llmOptions.Model) ?? _modelOptions.Models.First();
+            if (model is null)
+                return null;
+
             // TODO: process attachments.
 
             // TODO: probably extremely inefficient.
             var llmMessages = messages.Select(m =>
             {
-                if (_options.IncludeMessageSender && m.UserID != selfId)
-                    return new LlmMessage(m, _options.MessageWithSenderTemplate, _options.SenderPlaceholder, _options.MessagePlaceholder);
+                if (model.IncludeMessageSender && m.UserID != selfId)
+                    return new LlmMessage(m, model.MessageWithSenderTemplate, model.SenderPlaceholder, model.MessagePlaceholder);
                 else
                     return new LlmMessage(m);
             });
-            LlmMessage response = await _client.GenerateTextAsync(llmMessages, llmOptions.SystemPrompt ?? _options.DefaultSystemPrompt);
+            LlmMessage response = await _client.GenerateTextAsync(model, llmMessages, llmOptions.SystemPrompt ?? model.DefaultSystemPrompt);
 
-            if (_options.RemoveEmptyLines)
-                response.RemoveConsecutiveEmptyLines(_options.MaxEmptyLines);
+            if (model.RemoveEmptyLines)
+                response.RemoveConsecutiveEmptyLines(model.MaxEmptyLines);
 
             return response.Content;
         }

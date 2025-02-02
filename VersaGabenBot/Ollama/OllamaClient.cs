@@ -30,7 +30,6 @@ namespace VersaGabenBot.Ollama
         public OllamaClient(OllamaOptions options)
         {
             _options = options;
-
             _httpClient = new HttpClient()
             {
                 BaseAddress = new Uri(_options.OllamaApiUrl),
@@ -38,37 +37,31 @@ namespace VersaGabenBot.Ollama
             };
         }
 
-        public async Task<LlmMessage> GenerateTextAsync(string message)
+        public async Task<LlmMessage> GenerateTextAsync(Model model, string message)
         {
-            return await GenerateTextAsync(new LlmMessage(Roles.User, message));
+            return await GenerateTextAsync(model, new LlmMessage(Roles.User, message));
         }
 
-        public async Task<LlmMessage> GenerateTextAsync(LlmMessage message)
+        public async Task<LlmMessage> GenerateTextAsync(Model model, LlmMessage message)
         {
-            return await GenerateTextAsync([message]);
+            return await GenerateTextAsync(model, [message]);
         }
 
-        public async Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages)
+        public async Task<LlmMessage> GenerateTextAsync(Model model, IEnumerable<LlmMessage> messages)
         {
-            return await GenerateTextAsync(messages, null);
+            return await GenerateTextAsync(model, messages, null);
         }
 
-        public async Task<LlmMessage> GenerateTextAsync(IEnumerable<LlmMessage> messages, string systemPrompt)
+        public async Task<LlmMessage> GenerateTextAsync(Model model, IEnumerable<LlmMessage> messages, string systemPrompt)
         {
+
             ChatRequest chatRequest = new ChatRequest()
             {
-                Model = _options.Model,
+                Model = model.Name,
                 Messages = new List<LlmMessage>(),
-                ModelfileOptions = new ModelfileOptions()
-                {
-                    ContextWindow = _options.ContextWindow,
-                    Temperature = _options.Temperature,
-                    MinP = _options.MinP,
-                    TopP = _options.TopP,
-                    TopK = _options.TopK,
-                },
-                Stream = _options.Stream,
-                KeepAlive = _options.KeepAlive,
+                Parameters = model.Parameters,
+                Stream = model.Stream,
+                KeepAlive = model.KeepAlive,
             };
 
             if (!string.IsNullOrEmpty(systemPrompt))

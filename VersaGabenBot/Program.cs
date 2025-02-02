@@ -33,7 +33,7 @@ namespace VersaGabenBot
             logger.Info(Console.Title);
 
             OllamaClient ollamaClient = new OllamaClient(config.OllamaOptions);
-            LlmManager llmManager = new LlmManager(config.LlmOptions, ollamaClient);
+            LlmManager llmManager = new LlmManager(config.ModelOptions, ollamaClient);
 
             Bot bot = new Bot(config.BotConfig, config.ProxyOptions, dbContext, llmManager, guildRepository, channelRepository);
             await bot.Start();

@@ -262,12 +262,14 @@ namespace VersaGabenBot.Data.Repositories
                     {nameof(ChannelLlmOptions.MessagesContextSize)},
                     {nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
                     {nameof(ChannelLlmOptions.RandomReplyChance)},
+                    {nameof(ChannelLlmOptions.Model)},
                     {nameof(ChannelLlmOptions.SystemPrompt)}
                 ) VALUES (
                     @{nameof(options.ChannelID)},
                     @{nameof(ChannelLlmOptions.MessagesContextSize)},
                     @{nameof(ChannelLlmOptions.OnlyProcessChatHistoryRelatedToBot)},
                     @{nameof(ChannelLlmOptions.RandomReplyChance)},
+                    @{nameof(ChannelLlmOptions.Model)},
                     @{nameof(ChannelLlmOptions.SystemPrompt)}
                 );";
 
@@ -279,6 +281,7 @@ namespace VersaGabenBot.Data.Repositories
                     options.MessagesContextSize,
                     options.OnlyProcessChatHistoryRelatedToBot,
                     options.RandomReplyChance,
+                    options.Model,
                     options.SystemPrompt,
                 });
         }
