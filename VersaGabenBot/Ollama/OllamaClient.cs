@@ -1,16 +1,13 @@
-﻿using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using VersaGabenBot.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
+using System.Net.Http;
+using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using VersaGabenBot.LLM;
-using System.Linq;
-using VersaGabenBot.Data.Models;
+using VersaGabenBot.Options;
 
 namespace VersaGabenBot.Ollama
 {
@@ -65,7 +62,10 @@ namespace VersaGabenBot.Ollama
                 ModelfileOptions = new ModelfileOptions()
                 {
                     ContextWindow = _options.ContextWindow,
-                    Temperature = _options.Temperature
+                    Temperature = _options.Temperature,
+                    MinP = _options.MinP,
+                    MaxP = _options.MaxP,
+                    TopK = _options.TopK,
                 },
                 Stream = _options.Stream,
                 KeepAlive = _options.KeepAlive,
