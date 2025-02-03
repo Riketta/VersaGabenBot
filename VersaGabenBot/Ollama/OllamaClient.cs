@@ -54,7 +54,6 @@ namespace VersaGabenBot.Ollama
 
         public async Task<LlmMessage> GenerateTextAsync(Model model, IEnumerable<LlmMessage> messages, string systemPrompt)
         {
-
             ChatRequest chatRequest = new ChatRequest()
             {
                 Model = model.Name,
